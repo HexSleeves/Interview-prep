@@ -10,24 +10,31 @@ type Input = { nums: number[]; k: number };
 type Output = number;
 
 export const solution = (input: Input): Output => {
-  const { nums, k } = input;
-  if (nums.length < k) return 0;
+	const { nums, k } = input;
+	if (nums.length < k) return 0;
 
-  // Calculate sum of first window
-  let windowSum = 0;
-  for (let i = 0; i < k; i++) {
-    windowSum += nums[i]!;
-  }
+	// Calculate sum of first window
+	let windowSum = 0;
+	for (let i = 0; i < k; i++) {
+		const num = nums[i];
+		if (num !== undefined) {
+			windowSum += num;
+		}
+	}
 
-  let maxSum = windowSum;
+	let maxSum = windowSum;
 
-  // Slide the window: add next element, remove first element
-  for (let i = k; i < nums.length; i++) {
-    windowSum = windowSum + nums[i]! - nums[i - k]!;
-    maxSum = Math.max(maxSum, windowSum);
-  }
+	// Slide the window: add next element, remove first element
+	for (let i = k; i < nums.length; i++) {
+		const addNum = nums[i];
+		const removeNum = nums[i - k];
+		if (addNum !== undefined && removeNum !== undefined) {
+			windowSum = windowSum + addNum - removeNum;
+			maxSum = Math.max(maxSum, windowSum);
+		}
+	}
 
-  return maxSum;
+	return maxSum;
 };
 
 /**

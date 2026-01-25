@@ -6,30 +6,30 @@
  * Space Complexity: O(h) - recursion stack, h = height of tree
  */
 
-import { TreeNode } from "../../types/tree.ts";
+import type { TreeNode } from "../../types/tree.ts";
 
 type Input = { root: TreeNode | null; k: number };
 type Output = number;
 
 export const solution = (input: Input): Output => {
-  const { root, k } = input;
-  const values: number[] = [];
+	const { root, k } = input;
+	const values: number[] = [];
 
-  const inorder = (node: TreeNode | null): void => {
-    if (node === null || values.length >= k) return;
+	const inorder = (node: TreeNode | null): void => {
+		if (node === null || values.length >= k) return;
 
-    // Visit left subtree first (smaller values)
-    inorder(node.left);
+		// Visit left subtree first (smaller values)
+		inorder(node.left);
 
-    // Process current node
-    values.push(node.val);
+		// Process current node
+		values.push(node.val);
 
-    // Visit right subtree (larger values)
-    inorder(node.right);
-  };
+		// Visit right subtree (larger values)
+		inorder(node.right);
+	};
 
-  inorder(root);
-  return values[k - 1] ?? -1;
+	inorder(root);
+	return values[k - 1] ?? -1;
 };
 
 /**

@@ -6,30 +6,30 @@
  * Space Complexity: O(h) - recursion stack, h = height of tree
  */
 
-import { TreeNode } from "../../types/tree.ts";
+import type { TreeNode } from "../../types/tree.ts";
 
 type Input = { root: TreeNode | null };
 type Output = boolean;
 
 export const solution = (input: Input): Output => {
-  const validate = (
-    node: TreeNode | null,
-    min: number,
-    max: number
-  ): boolean => {
-    if (node === null) return true;
+	const validate = (
+		node: TreeNode | null,
+		min: number,
+		max: number,
+	): boolean => {
+		if (node === null) return true;
 
-    // Current node must be within valid range
-    if (node.val <= min || node.val >= max) return false;
+		// Current node must be within valid range
+		if (node.val <= min || node.val >= max) return false;
 
-    // Left subtree: all values must be less than current node
-    // Right subtree: all values must be greater than current node
-    return (
-      validate(node.left, min, node.val) && validate(node.right, node.val, max)
-    );
-  };
+		// Left subtree: all values must be less than current node
+		// Right subtree: all values must be greater than current node
+		return (
+			validate(node.left, min, node.val) && validate(node.right, node.val, max)
+		);
+	};
 
-  return validate(input.root, -Infinity, Infinity);
+	return validate(input.root, -Infinity, Infinity);
 };
 
 /**

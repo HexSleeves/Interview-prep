@@ -10,32 +10,33 @@ type Input = { nums: number[]; k: number };
 type Output = number;
 
 export const solution = (input: Input): Output => {
-  const { nums, k } = input;
+	const { nums, k } = input;
 
-  // Map to count occurrences of each prefix sum
-  const prefixSumCount = new Map<number, number>();
-  // Empty prefix (sum = 0) occurs once before we start
-  prefixSumCount.set(0, 1);
+	// Map to count occurrences of each prefix sum
+	const prefixSumCount = new Map<number, number>();
+	// Empty prefix (sum = 0) occurs once before we start
+	prefixSumCount.set(0, 1);
 
-  let prefixSum = 0;
-  let count = 0;
+	let prefixSum = 0;
+	let count = 0;
 
-  for (const num of nums) {
-    prefixSum += num;
+	for (const num of nums) {
+		prefixSum += num;
 
-    // If (prefixSum - k) exists, we found subarrays ending here with sum k
-    // Because: currentPrefix - previousPrefix = k
-    // Rearranged: previousPrefix = currentPrefix - k
-    const complement = prefixSum - k;
-    if (prefixSumCount.has(complement)) {
-      count += prefixSumCount.get(complement)!;
-    }
+		// If (prefixSum - k) exists, we found subarrays ending here with sum k
+		// Because: currentPrefix - previousPrefix = k
+		// Rearranged: previousPrefix = currentPrefix - k
+		const complement = prefixSum - k;
+		const complementCount = prefixSumCount.get(complement);
+		if (complementCount !== undefined) {
+			count += complementCount;
+		}
 
-    // Record this prefix sum
-    prefixSumCount.set(prefixSum, (prefixSumCount.get(prefixSum) ?? 0) + 1);
-  }
+		// Record this prefix sum
+		prefixSumCount.set(prefixSum, (prefixSumCount.get(prefixSum) ?? 0) + 1);
+	}
 
-  return count;
+	return count;
 };
 
 /**

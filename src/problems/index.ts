@@ -4,19 +4,24 @@ import { prefixSumProblems } from "./prefix-sum/index.ts";
 import { slidingWindowProblems } from "./sliding-window/index.ts";
 
 export const allProblems = [
-  ...bstProblems,
-  ...frequencyProblems,
-  ...prefixSumProblems,
-  ...slidingWindowProblems,
+	...bstProblems,
+	...frequencyProblems,
+	...prefixSumProblems,
+	...slidingWindowProblems,
 ];
 
 export const problemsByDomain = {
-  "binary-search-tree": bstProblems,
-  frequency: frequencyProblems,
-  "prefix-sum": prefixSumProblems,
-  "sliding-window": slidingWindowProblems,
+	"binary-search-tree": bstProblems,
+	frequency: frequencyProblems,
+	"prefix-sum": prefixSumProblems,
+	"sliding-window": slidingWindowProblems,
 };
 
 export type Domain = keyof typeof problemsByDomain;
 
-export { bstProblems, frequencyProblems, prefixSumProblems, slidingWindowProblems };
+export {
+	bstProblems,
+	frequencyProblems,
+	prefixSumProblems,
+	slidingWindowProblems,
+};

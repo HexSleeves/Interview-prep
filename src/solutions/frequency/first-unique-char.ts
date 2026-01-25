@@ -10,22 +10,23 @@ type Input = { s: string };
 type Output = number;
 
 export const solution = (input: Input): Output => {
-  const { s } = input;
+	const { s } = input;
 
-  // Step 1: Count frequency of each character
-  const freqMap = new Map<string, number>();
-  for (const char of s) {
-    freqMap.set(char, (freqMap.get(char) ?? 0) + 1);
-  }
+	// Step 1: Count frequency of each character
+	const freqMap = new Map<string, number>();
+	for (const char of s) {
+		freqMap.set(char, (freqMap.get(char) ?? 0) + 1);
+	}
 
-  // Step 2: Find first character with frequency 1
-  for (let i = 0; i < s.length; i++) {
-    if (freqMap.get(s[i]!) === 1) {
-      return i;
-    }
-  }
+	// Step 2: Find first character with frequency 1
+	for (let i = 0; i < s.length; i++) {
+		const char = s[i];
+		if (char !== undefined && freqMap.get(char) === 1) {
+			return i;
+		}
+	}
 
-  return -1;
+	return -1;
 };
 
 /**

@@ -10,9 +10,17 @@
     "test:bst": "bun run src/cli.ts run --domain binary-search-tree",
     "test:frequency": "bun run src/cli.ts run --domain frequency",
     "test:prefix": "bun run src/cli.ts run --domain prefix-sum",
-    "test:window": "bun run src/cli.ts run --domain sliding-window"
+    "test:window": "bun run src/cli.ts run --domain sliding-window",
+    "format": "bunx biome format --write",
+    "format:files": "bunx biome format --write --",
+    "lint": "bunx biome lint --write",
+    "lint:files": "bunx biome lint --write --",
+    "check": "bunx biome check --write",
+    "check:files": "bunx biome check --write --",
+    "typecheck": "bunx tsc --noEmit"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.12",
     "@types/bun": "latest"
   },
   "peerDependencies": {

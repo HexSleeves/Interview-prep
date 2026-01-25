@@ -3,35 +3,36 @@ import type { Problem } from "../../types/problem.ts";
 type Input = { s: string };
 type Output = number;
 
-export const solution = (input: Input): Output => {
-  // TODO: Implement your solution here
-  // Given a string s, find the first non-repeating character and return its index.
-  // If it does not exist, return -1.
-  throw new Error("Not implemented");
+export const solution = (_input: Input): Output => {
+	// TODO: Implement your solution here
+	// Given a string s, find the first non-repeating character and return its index.
+	// If it does not exist, return -1.
+	throw new Error("Not implemented");
 };
 
 // Reference solution (hidden during practice)
 const referenceSolution = (input: Input): Output => {
-  const { s } = input;
-  const freqMap = new Map<string, number>();
+	const { s } = input;
+	const freqMap = new Map<string, number>();
 
-  for (const char of s) {
-    freqMap.set(char, (freqMap.get(char) ?? 0) + 1);
-  }
+	for (const char of s) {
+		freqMap.set(char, (freqMap.get(char) ?? 0) + 1);
+	}
 
-  for (let i = 0; i < s.length; i++) {
-    if (freqMap.get(s[i]!) === 1) {
-      return i;
-    }
-  }
+	for (let i = 0; i < s.length; i++) {
+		const char = s[i];
+		if (char !== undefined && freqMap.get(char) === 1) {
+			return i;
+		}
+	}
 
-  return -1;
+	return -1;
 };
 
 export const problem: Problem<Input, Output> = {
-  id: "freq-002",
-  title: "First Unique Character in a String",
-  description: `Given a string s, find the first non-repeating character in it and return its index. If it does not exist, return -1.
+	id: "freq-002",
+	title: "First Unique Character in a String",
+	description: `Given a string s, find the first non-repeating character in it and return its index. If it does not exist, return -1.
 
 Example 1:
   Input: s = "leetcode"
@@ -51,44 +52,44 @@ Example 3:
 Constraints:
 - 1 <= s.length <= 10^5
 - s consists of only lowercase English letters.`,
-  difficulty: "easy",
-  tags: ["frequency", "hash-map", "string"],
-  hints: [
-    "Use a hash map to count the frequency of each character.",
-    "Then iterate through the string again to find the first character with frequency 1.",
-    "This gives you O(n) time complexity.",
-  ],
-  testCases: [
-    {
-      input: { s: "leetcode" },
-      expected: 0,
-      description: "First character is unique",
-    },
-    {
-      input: { s: "loveleetcode" },
-      expected: 2,
-      description: "Unique character in middle",
-    },
-    {
-      input: { s: "aabb" },
-      expected: -1,
-      description: "No unique character",
-    },
-    {
-      input: { s: "a" },
-      expected: 0,
-      description: "Single character string",
-    },
-    {
-      input: { s: "aabbccd" },
-      expected: 6,
-      description: "Unique character at end",
-    },
-    {
-      input: { s: "abcabc" },
-      expected: -1,
-      description: "All characters appear twice",
-    },
-  ],
-  solution: referenceSolution,
+	difficulty: "easy",
+	tags: ["frequency", "hash-map", "string"],
+	hints: [
+		"Use a hash map to count the frequency of each character.",
+		"Then iterate through the string again to find the first character with frequency 1.",
+		"This gives you O(n) time complexity.",
+	],
+	testCases: [
+		{
+			input: { s: "leetcode" },
+			expected: 0,
+			description: "First character is unique",
+		},
+		{
+			input: { s: "loveleetcode" },
+			expected: 2,
+			description: "Unique character in middle",
+		},
+		{
+			input: { s: "aabb" },
+			expected: -1,
+			description: "No unique character",
+		},
+		{
+			input: { s: "a" },
+			expected: 0,
+			description: "Single character string",
+		},
+		{
+			input: { s: "aabbccd" },
+			expected: 6,
+			description: "Unique character at end",
+		},
+		{
+			input: { s: "abcabc" },
+			expected: -1,
+			description: "All characters appear twice",
+		},
+	],
+	solution: referenceSolution,
 };

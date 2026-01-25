@@ -10,30 +10,32 @@ type Input = { s: string };
 type Output = number;
 
 export const solution = (input: Input): Output => {
-  const { s } = input;
+	const { s } = input;
 
-  // Map: character -> most recent index where it appeared
-  const charIndex = new Map<string, number>();
-  let maxLength = 0;
-  let left = 0;
+	// Map: character -> most recent index where it appeared
+	const charIndex = new Map<string, number>();
+	let maxLength = 0;
+	let left = 0;
 
-  for (let right = 0; right < s.length; right++) {
-    const char = s[right]!;
+	for (let right = 0; right < s.length; right++) {
+		const char = s[right];
+		if (char === undefined) continue;
 
-    // If char was seen before AND is within current window
-    if (charIndex.has(char) && charIndex.get(char)! >= left) {
-      // Move left pointer past the previous occurrence
-      left = charIndex.get(char)! + 1;
-    }
+		// If char was seen before AND is within current window
+		const prevIndex = charIndex.get(char);
+		if (prevIndex !== undefined && prevIndex >= left) {
+			// Move left pointer past the previous occurrence
+			left = prevIndex + 1;
+		}
 
-    // Update character's most recent position
-    charIndex.set(char, right);
+		// Update character's most recent position
+		charIndex.set(char, right);
 
-    // Update max length
-    maxLength = Math.max(maxLength, right - left + 1);
-  }
+		// Update max length
+		maxLength = Math.max(maxLength, right - left + 1);
+	}
 
-  return maxLength;
+	return maxLength;
 };
 
 /**

@@ -10,21 +10,30 @@ type Input = { nums: number[]; queries: [number, number][] };
 type Output = number[];
 
 export const solution = (input: Input): Output => {
-  const { nums, queries } = input;
+	const { nums, queries } = input;
 
-  // Build prefix sum array
-  // prefixSum[i] = sum of nums[0..i-1]
-  // prefixSum[0] = 0 (sum of empty prefix)
-  const prefixSum: number[] = [0];
-  for (let i = 0; i < nums.length; i++) {
-    prefixSum.push(prefixSum[i]! + nums[i]!);
-  }
+	// Build prefix sum array
+	// prefixSum[i] = sum of nums[0..i-1]
+	// prefixSum[0] = 0 (sum of empty prefix)
+	const prefixSum: number[] = [0];
+	for (let i = 0; i < nums.length; i++) {
+		const prevSum = prefixSum[i];
+		const num = nums[i];
+		if (prevSum !== undefined && num !== undefined) {
+			prefixSum.push(prevSum + num);
+		}
+	}
 
-  // Answer each query in O(1)
-  // sum(left, right) = prefixSum[right + 1] - prefixSum[left]
-  return queries.map(([left, right]) => {
-    return prefixSum[right + 1]! - prefixSum[left]!;
-  });
+	// Answer each query in O(1)
+	// sum(left, right) = prefixSum[right + 1] - prefixSum[left]
+	return queries.map(([left, right]) => {
+		const rightSum = prefixSum[right + 1];
+		const leftSum = prefixSum[left];
+		if (rightSum !== undefined && leftSum !== undefined) {
+			return rightSum - leftSum;
+		}
+		return 0;
+	});
 };
 
 /**

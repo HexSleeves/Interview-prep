@@ -10,29 +10,35 @@ type Input = { nums: number[]; k: number };
 type Output = number[];
 
 export const solution = (input: Input): Output => {
-  const { nums, k } = input;
+	const { nums, k } = input;
 
-  // Step 1: Count frequency of each number
-  const freqMap = new Map<number, number>();
-  for (const num of nums) {
-    freqMap.set(num, (freqMap.get(num) ?? 0) + 1);
-  }
+	// Step 1: Count frequency of each number
+	const freqMap = new Map<number, number>();
+	for (const num of nums) {
+		freqMap.set(num, (freqMap.get(num) ?? 0) + 1);
+	}
 
-  // Step 2: Create buckets where index = frequency
-  // Maximum frequency possible is nums.length
-  const buckets: number[][] = Array.from({ length: nums.length + 1 }, () => []);
+	// Step 2: Create buckets where index = frequency
+	// Maximum frequency possible is nums.length
+	const buckets: number[][] = Array.from({ length: nums.length + 1 }, () => []);
 
-  for (const [num, freq] of freqMap) {
-    buckets[freq]!.push(num);
-  }
+	for (const [num, freq] of freqMap) {
+		const bucket = buckets[freq];
+		if (bucket) {
+			bucket.push(num);
+		}
+	}
 
-  // Step 3: Collect k most frequent elements from highest frequency buckets
-  const result: number[] = [];
-  for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
-    result.push(...buckets[i]!);
-  }
+	// Step 3: Collect k most frequent elements from highest frequency buckets
+	const result: number[] = [];
+	for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
+		const bucket = buckets[i];
+		if (bucket) {
+			result.push(...bucket);
+		}
+	}
 
-  return result.slice(0, k).sort((a, b) => a - b);
+	return result.slice(0, k).sort((a, b) => a - b);
 };
 
 /**
