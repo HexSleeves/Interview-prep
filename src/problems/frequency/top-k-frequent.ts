@@ -10,37 +10,6 @@ export const solution = (_input: Input): Output => {
 	throw new Error("Not implemented");
 };
 
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-	const { nums, k } = input;
-	const freqMap = new Map<number, number>();
-
-	for (const num of nums) {
-		freqMap.set(num, (freqMap.get(num) ?? 0) + 1);
-	}
-
-	// Bucket sort approach
-	const buckets: number[][] = Array.from({ length: nums.length + 1 }, () => []);
-
-	for (const [num, freq] of freqMap) {
-		const bucket = buckets[freq];
-		if (bucket) {
-			bucket.push(num);
-		}
-	}
-
-	const result: number[] = [];
-	for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
-		const bucket = buckets[i];
-		if (bucket) {
-			result.push(...bucket);
-		}
-	}
-
-	return result.slice(0, k).sort((a, b) => a - b);
-};
-
-
 export const problem: Problem<Input, Output> = {
 	id: "freq-001",
 	title: "Top K Frequent Elements",
@@ -95,5 +64,5 @@ Follow up: Your algorithm's time complexity must be better than O(n log n).`,
 			description: "Return top 3 frequent",
 		},
 	],
-	solution: referenceSolution,
+	solution,
 };

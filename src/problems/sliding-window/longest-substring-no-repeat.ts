@@ -10,29 +10,6 @@ export const solution = (_input: Input): Output => {
 	throw new Error("Not implemented");
 };
 
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-	const { s } = input;
-	const charIndex = new Map<string, number>();
-	let maxLength = 0;
-	let left = 0;
-
-	for (let right = 0; right < s.length; right++) {
-		const char = s[right];
-		if (char === undefined) continue;
-
-		const prevIndex = charIndex.get(char);
-		if (prevIndex !== undefined && prevIndex >= left) {
-			left = prevIndex + 1;
-		}
-
-		charIndex.set(char, right);
-		maxLength = Math.max(maxLength, right - left + 1);
-	}
-
-	return maxLength;
-};
-
 export const problem: Problem<Input, Output> = {
 	id: "window-002",
 	title: "Longest Substring Without Repeating Characters",
@@ -101,5 +78,5 @@ Constraints:
 			description: "Tricky case - 'vdf' is longest",
 		},
 	],
-	solution: referenceSolution,
+	solution,
 };

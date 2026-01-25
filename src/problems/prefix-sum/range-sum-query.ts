@@ -11,31 +11,6 @@ export const solution = (_input: Input): Output => {
 	throw new Error("Not implemented");
 };
 
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-	const { nums, queries } = input;
-
-	// Build prefix sum array
-	const prefixSum: number[] = [0];
-	for (let i = 0; i < nums.length; i++) {
-		const prevSum = prefixSum[i];
-		const num = nums[i];
-		if (prevSum !== undefined && num !== undefined) {
-			prefixSum.push(prevSum + num);
-		}
-	}
-
-	// Answer queries in O(1) each
-	return queries.map(([left, right]) => {
-		const rightSum = prefixSum[right + 1];
-		const leftSum = prefixSum[left];
-		if (rightSum !== undefined && leftSum !== undefined) {
-			return rightSum - leftSum;
-		}
-		return 0;
-	});
-};
-
 export const problem: Problem<Input, Output> = {
 	id: "prefix-001",
 	title: "Range Sum Query - Immutable",
@@ -110,5 +85,5 @@ Constraints:
 			description: "All same values",
 		},
 	],
-	solution: referenceSolution,
+	solution,
 };

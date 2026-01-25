@@ -11,22 +11,6 @@ export const solution = (_input: Input): Output => {
 	throw new Error("Not implemented");
 };
 
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-	const { root, k } = input;
-	const values: number[] = [];
-
-	const inorder = (node: TreeNode | null): void => {
-		if (node === null || values.length >= k) return;
-		inorder(node.left);
-		values.push(node.val);
-		inorder(node.right);
-	};
-
-	inorder(root);
-	return values[k - 1] ?? -1;
-};
-
 export const problem: Problem<Input, Output> = {
 	id: "bst-002",
 	title: "Kth Smallest Element in a BST",
@@ -78,5 +62,5 @@ Constraints:
 			description: "Find root value",
 		},
 	],
-	solution: referenceSolution,
+	solution,
 };

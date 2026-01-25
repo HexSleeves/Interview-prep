@@ -15,23 +15,6 @@ export const solution = (_input: Input): Output => {
 	throw new Error("Not implemented");
 };
 
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-	const validate = (
-		node: TreeNode | null,
-		min: number,
-		max: number,
-	): boolean => {
-		if (node === null) return true;
-		if (node.val <= min || node.val >= max) return false;
-		return (
-			validate(node.left, min, node.val) && validate(node.right, node.val, max)
-		);
-	};
-
-	return validate(input.root, -Infinity, Infinity);
-};
-
 export const problem: Problem<Input, Output> = {
 	id: "bst-001",
 	title: "Validate Binary Search Tree",
@@ -89,5 +72,5 @@ Example 2:
 			description: "Valid larger BST",
 		},
 	],
-	solution: referenceSolution,
+	solution,
 };

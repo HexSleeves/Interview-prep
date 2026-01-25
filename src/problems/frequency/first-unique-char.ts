@@ -10,25 +10,6 @@ export const solution = (_input: Input): Output => {
 	throw new Error("Not implemented");
 };
 
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-	const { s } = input;
-	const freqMap = new Map<string, number>();
-
-	for (const char of s) {
-		freqMap.set(char, (freqMap.get(char) ?? 0) + 1);
-	}
-
-	for (let i = 0; i < s.length; i++) {
-		const char = s[i];
-		if (char !== undefined && freqMap.get(char) === 1) {
-			return i;
-		}
-	}
-
-	return -1;
-};
-
 export const problem: Problem<Input, Output> = {
 	id: "freq-002",
 	title: "First Unique Character in a String",
@@ -91,5 +72,5 @@ Constraints:
 			description: "All characters appear twice",
 		},
 	],
-	solution: referenceSolution,
+	solution,
 };

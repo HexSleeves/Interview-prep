@@ -11,29 +11,6 @@ export const solution = (_input: Input): Output => {
 	throw new Error("Not implemented");
 };
 
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-	const { nums, k } = input;
-	const prefixSumCount = new Map<number, number>();
-	prefixSumCount.set(0, 1);
-
-	let prefixSum = 0;
-	let count = 0;
-
-	for (const num of nums) {
-		prefixSum += num;
-		// If (prefixSum - k) exists in map, we found subarrays ending here with sum k
-		const complement = prefixSum - k;
-		const complementCount = prefixSumCount.get(complement);
-		if (complementCount !== undefined) {
-			count += complementCount;
-		}
-		prefixSumCount.set(prefixSum, (prefixSumCount.get(prefixSum) ?? 0) + 1);
-	}
-
-	return count;
-};
-
 export const problem: Problem<Input, Output> = {
 	id: "prefix-002",
 	title: "Subarray Sum Equals K",
@@ -94,5 +71,5 @@ Constraints:
 			description: "Single element, no match",
 		},
 	],
-	solution: referenceSolution,
+	solution,
 };

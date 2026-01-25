@@ -10,35 +10,6 @@ export const solution = (_input: Input): Output => {
 	throw new Error("Not implemented");
 };
 
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-	const { nums, k } = input;
-	if (nums.length < k) return 0;
-
-	// Calculate sum of first window
-	let windowSum = 0;
-	for (let i = 0; i < k; i++) {
-		const num = nums[i];
-		if (num !== undefined) {
-			windowSum += num;
-		}
-	}
-
-	let maxSum = windowSum;
-
-	// Slide the window
-	for (let i = k; i < nums.length; i++) {
-		const addNum = nums[i];
-		const removeNum = nums[i - k];
-		if (addNum !== undefined && removeNum !== undefined) {
-			windowSum = windowSum + addNum - removeNum;
-			maxSum = Math.max(maxSum, windowSum);
-		}
-	}
-
-	return maxSum;
-};
-
 export const problem: Problem<Input, Output> = {
 	id: "window-001",
 	title: "Maximum Sum Subarray of Size K",
@@ -96,5 +67,5 @@ Constraints:
 			description: "Max sum at the end",
 		},
 	],
-	solution: referenceSolution,
+	solution,
 };
