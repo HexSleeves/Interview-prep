@@ -1,0 +1,21 @@
+{
+  "name": "interview-prep",
+  "module": "src/cli.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "cli": "bun run src/cli.ts",
+    "list": "bun run src/cli.ts list",
+    "test": "bun run src/cli.ts run --all",
+    "test:bst": "bun run src/cli.ts run --domain binary-search-tree",
+    "test:frequency": "bun run src/cli.ts run --domain frequency",
+    "test:prefix": "bun run src/cli.ts run --domain prefix-sum",
+    "test:window": "bun run src/cli.ts run --domain sliding-window"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
