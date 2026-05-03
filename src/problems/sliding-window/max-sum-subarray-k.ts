@@ -1,38 +1,9 @@
-import type { Problem } from "../../types/problem.ts";
+import type { ProblemDefinition } from "../../types/problem.ts";
 
 type Input = { nums: number[]; k: number };
 type Output = number;
 
-export const solution = (input: Input): Output => {
-  // TODO: Implement your solution here
-  // Given an array of integers nums and an integer k, find the maximum sum
-  // of any contiguous subarray of size k.
-  throw new Error("not implemented");
-};
-
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-  const { nums, k } = input;
-  if (nums.length < k) return 0;
-
-  // Calculate sum of first window
-  let windowSum = 0;
-  for (let i = 0; i < k; i++) {
-    windowSum += nums[i]!;
-  }
-
-  let maxSum = windowSum;
-
-  // Slide the window
-  for (let i = k; i < nums.length; i++) {
-    windowSum = windowSum + nums[i]! - nums[i - k]!;
-    maxSum = Math.max(maxSum, windowSum);
-  }
-
-  return maxSum;
-};
-
-export const problem: Problem<Input, Output> = {
+export const problem: ProblemDefinition<Input, Output> = {
   id: "window-001",
   title: "Maximum Sum Subarray of Size K",
   description: `Given an array of integers nums and an integer k, find the maximum sum of any contiguous subarray of size k.
@@ -89,6 +60,4 @@ Constraints:
       description: "Max sum at the end",
     },
   ],
-  solution,
-  referenceSolution,
 };

@@ -1,33 +1,10 @@
-import type { Problem } from "../../types/problem.ts";
+import type { ProblemDefinition } from "../../types/problem.ts";
 import { TreeNode, arrayToBST } from "../../types/tree.ts";
 
 type Input = { root: TreeNode | null; k: number };
 type Output = number;
 
-export const solution = (input: Input): Output => {
-  // TODO: Implement your solution here
-  // Given the root of a BST and an integer k, return the kth smallest value (1-indexed).
-  // You may assume k is always valid (1 <= k <= n where n is the number of nodes).
-  throw new Error("not implemented");
-};
-
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-  const { root, k } = input;
-  const values: number[] = [];
-
-  const inorder = (node: TreeNode | null): void => {
-    if (node === null || values.length >= k) return;
-    inorder(node.left);
-    values.push(node.val);
-    inorder(node.right);
-  };
-
-  inorder(root);
-  return values[k - 1] ?? -1;
-};
-
-export const problem: Problem<Input, Output> = {
+export const problem: ProblemDefinition<Input, Output> = {
   id: "bst-002",
   title: "Kth Smallest Element in a BST",
   description: `Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.
@@ -78,6 +55,4 @@ Constraints:
       description: "Find root value",
     },
   ],
-  solution,
-  referenceSolution,
 };

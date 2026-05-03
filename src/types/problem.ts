@@ -12,19 +12,23 @@ export type CompareOutput<TOutput, TInput = unknown> = (
   testCase: TestCase<TInput, TOutput>
 ) => boolean;
 
-export interface Problem<TInput, TOutput> {
+export interface ProblemDefinition<TInput, TOutput> {
   id: string;
   title: string;
   description: string;
   difficulty: "easy" | "medium" | "hard";
   tags: string[];
   testCases: TestCase<TInput, TOutput>[];
-  solution: Solution<TInput, TOutput>;
-  referenceSolution: Solution<TInput, TOutput>;
   compareOutput?: CompareOutput<TOutput, TInput>;
   hints?: string[];
 }
 
+export interface Problem<TInput, TOutput> extends ProblemDefinition<TInput, TOutput> {
+  solution: Solution<TInput, TOutput>;
+  referenceSolution: Solution<TInput, TOutput>;
+}
+
+export type AnyProblemDefinition = ProblemDefinition<any, any>;
 export type AnyProblem = Problem<any, any>;
 
 export type RunMode = "solution" | "reference";

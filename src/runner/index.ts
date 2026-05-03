@@ -1,11 +1,4 @@
-import type {
-  Problem,
-  ProblemResult,
-  RunMode,
-  RunProblemOptions,
-  SuiteResult,
-  AnyProblem,
-} from "../types/problem.ts";
+import type { Problem, ProblemResult, RunMode, RunProblemOptions, SuiteResult, AnyProblem } from "../types/problem.ts";
 
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
@@ -31,12 +24,11 @@ function deepEqual(a: unknown, b: unknown): boolean {
 
 export function runProblem<TInput, TOutput>(
   problem: Problem<TInput, TOutput>,
-  options: RunProblemOptions = {}
+  options: RunProblemOptions = {},
 ): ProblemResult {
   const mode = options.mode ?? "solution";
   const start = performance.now();
-  const candidate =
-    mode === "reference" ? problem.referenceSolution : problem.solution;
+  const candidate = mode === "reference" ? problem.referenceSolution : problem.solution;
   const compareOutput = problem.compareOutput ?? deepEqual;
   const failures: ProblemResult["failures"] = [];
   let passed = 0;
@@ -77,10 +69,7 @@ export function runProblem<TInput, TOutput>(
   };
 }
 
-export function runSuite(
-  problems: AnyProblem[],
-  options: RunProblemOptions = {}
-): SuiteResult {
+export function runSuite(problems: AnyProblem[], options: RunProblemOptions = {}): SuiteResult {
   const mode: RunMode = options.mode ?? "solution";
   const start = performance.now();
   const results: ProblemResult[] = [];

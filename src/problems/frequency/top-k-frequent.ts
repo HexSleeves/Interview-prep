@@ -1,38 +1,7 @@
-import type { Problem } from "../../types/problem.ts";
+import type { ProblemDefinition } from "../../types/problem.ts";
 
 type Input = { nums: number[]; k: number };
 type Output = number[];
-
-export const solution = (input: Input): Output => {
-  // TODO: Implement your solution here
-  // Given an integer array nums and an integer k, return the k most frequent elements.
-  // You may return the answer in any order.
-  throw new Error("not implemented");
-};
-
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-  const { nums, k } = input;
-  const freqMap = new Map<number, number>();
-
-  for (const num of nums) {
-    freqMap.set(num, (freqMap.get(num) ?? 0) + 1);
-  }
-
-  // Bucket sort approach
-  const buckets: number[][] = Array.from({ length: nums.length + 1 }, () => []);
-
-  for (const [num, freq] of freqMap) {
-    buckets[freq]!.push(num);
-  }
-
-  const result: number[] = [];
-  for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
-    result.push(...buckets[i]!);
-  }
-
-  return result.slice(0, k).sort((a, b) => a - b);
-};
 
 // Custom comparison that sorts both arrays for comparison
 const compareOutput = (expected: Output, received: Output): boolean => {
@@ -42,7 +11,7 @@ const compareOutput = (expected: Output, received: Output): boolean => {
   return sortedExpected.every((val, idx) => val === sortedReceived[idx]);
 };
 
-export const problem: Problem<Input, Output> = {
+export const problem: ProblemDefinition<Input, Output> = {
   id: "freq-001",
   title: "Top K Frequent Elements",
   description: `Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.
@@ -96,7 +65,5 @@ Follow up: Your algorithm's time complexity must be better than O(n log n).`,
       description: "Return top 3 frequent",
     },
   ],
-  solution,
-  referenceSolution,
   compareOutput,
 };

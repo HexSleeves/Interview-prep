@@ -1,9 +1,10 @@
 # Interview Prep
 
-A TypeScript coding interview practice harness built with Bun. Problems are organized by domain and each problem has two implementations:
+A TypeScript coding interview practice harness built with Bun. Problem prompts, learner stubs, and reference solutions are split so the answer key is not sitting next to the file you edit while practicing:
 
-- `solution`: the editable learner stub you practice in.
-- `referenceSolution`: the known-good implementation used to validate the repository.
+- `src/problems`: prompts, tags, hints, test cases, and custom comparators.
+- `src/solutions`: editable learner stubs.
+- `src/reference`: known-good implementations used by `check` mode.
 
 ## Setup
 
@@ -26,7 +27,7 @@ bun install
    bun run cli show bst-001 --hints
    ```
 
-3. Open the problem file in `src/problems/<domain>/`.
+3. Open the learner file in `src/solutions/<domain>/`.
 4. Implement the exported `solution` function.
 5. Run your solution:
 
@@ -97,6 +98,7 @@ bun run cli check --all
 src/
 ├── cli.ts                    # CLI entry point
 ├── cli.test.ts               # CLI smoke tests
+├── registry/                 # Composes prompts, learner stubs, and references
 ├── runner/                   # Harness logic and tests
 │   ├── index.ts
 │   └── index.test.ts
@@ -104,21 +106,26 @@ src/
 │   ├── index.ts
 │   ├── problem.ts
 │   └── tree.ts
-└── problems/                 # Problems organized by domain
-    ├── _template.problem.ts
-    ├── index.ts
-    ├── binary-search-tree/
-    ├── frequency/
-    ├── prefix-sum/
-    └── sliding-window/
+├── problems/                 # Prompts, tests, hints, and comparators
+│   ├── _template.problem.ts
+│   ├── index.ts
+│   ├── binary-search-tree/
+│   ├── frequency/
+│   ├── prefix-sum/
+│   └── sliding-window/
+├── solutions/                # Editable learner stubs
+└── reference/                # Answer key used by check mode
 ```
 
 ## Add a Problem
 
 1. Copy `src/problems/_template.problem.ts` into the target domain folder.
-2. Fill in the `Input`, `Output`, prompt, test cases, hints, `solution`, and `referenceSolution`.
-3. Add the problem to the domain's `index.ts`.
-4. Run:
+2. Copy `src/solutions/_template.solution.ts` into the matching domain folder.
+3. Copy `src/reference/_template.reference.ts` into the matching domain folder.
+4. Fill in the `Input`, `Output`, prompt, test cases, hints, learner stub, and reference solution.
+5. Add the problem definition to the domain's `src/problems/<domain>/index.ts`.
+6. Wire the problem definition, learner solution, and reference solution together in `src/registry/<domain>.ts`.
+7. Run:
 
    ```bash
    bun run test

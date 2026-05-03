@@ -5,17 +5,21 @@ This repository is a Bun/TypeScript interview practice harness. Problems should 
 ## Add a Problem
 
 1. Copy `src/problems/_template.problem.ts` into the correct domain folder.
-2. Replace the sample `Input`, `Output`, prompt, tags, hints, test cases, and reference solution.
-3. Keep `solution` as the editable learner stub that throws `new Error("not implemented")`.
-4. Keep `referenceSolution` complete and deterministic.
-5. Export the problem from the domain `index.ts`.
-6. Run `bun run test`.
+2. Copy `src/solutions/_template.solution.ts` into the matching domain folder.
+3. Copy `src/reference/_template.reference.ts` into the matching domain folder.
+4. Replace the sample `Input`, `Output`, prompt, tags, hints, test cases, learner stub, and reference solution.
+5. Keep the learner `solution` stub in `src/solutions` throwing `new Error("not implemented")`.
+6. Keep `referenceSolution` in `src/reference` complete and deterministic.
+7. Export the problem definition from the domain `src/problems/<domain>/index.ts`.
+8. Compose the definition, learner solution, and reference solution in `src/registry/<domain>.ts`.
+9. Run `bun run test`.
 
 ## Problem Conventions
 
 - IDs use the existing domain prefix style, such as `bst-003`, `freq-003`, `prefix-003`, or `window-003`.
 - Difficulty must be `easy`, `medium`, or `hard`.
 - Test cases should include the example cases, a small edge case, and at least one case that catches the common brute-force or off-by-one mistake.
+- `src/problems` files must not export or import executable solutions.
 - `description` should be self-contained because `bun run cli show <problem-id>` prints it directly.
 - Hints should progress from general strategy to a near-solution pointer.
 

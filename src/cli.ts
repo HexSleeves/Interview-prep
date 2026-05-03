@@ -1,14 +1,5 @@
-import {
-  formatProblemResult,
-  formatSuiteResult,
-  runProblem,
-  runSuite,
-} from "./runner/index.ts";
-import {
-  allProblems,
-  problemsByDomain,
-  type Domain,
-} from "./problems/index.ts";
+import { formatProblemResult, formatSuiteResult, runProblem, runSuite } from "./runner/index.ts";
+import { allProblems, problemsByDomain, type Domain } from "./registry/index.ts";
 import type { AnyProblem, RunMode } from "./types/problem.ts";
 
 const DOMAINS = Object.keys(problemsByDomain) as Domain[];
@@ -91,9 +82,7 @@ function listProblems(domain?: string): void {
 
 function printProblemRows(problems: readonly AnyProblem[]): void {
   for (const problem of problems) {
-    console.log(
-      `  ${problem.id.padEnd(12)} | ${problem.difficulty.padEnd(6)} | ${problem.title}`
-    );
+    console.log(`  ${problem.id.padEnd(12)} | ${problem.difficulty.padEnd(6)} | ${problem.title}`);
   }
 }
 

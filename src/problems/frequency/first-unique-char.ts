@@ -1,34 +1,9 @@
-import type { Problem } from "../../types/problem.ts";
+import type { ProblemDefinition } from "../../types/problem.ts";
 
 type Input = { s: string };
 type Output = number;
 
-export const solution = (input: Input): Output => {
-  // TODO: Implement your solution here
-  // Given a string s, find the first non-repeating character and return its index.
-  // If it does not exist, return -1.
-  throw new Error("not implemented");
-};
-
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-  const { s } = input;
-  const freqMap = new Map<string, number>();
-
-  for (const char of s) {
-    freqMap.set(char, (freqMap.get(char) ?? 0) + 1);
-  }
-
-  for (let i = 0; i < s.length; i++) {
-    if (freqMap.get(s[i]!) === 1) {
-      return i;
-    }
-  }
-
-  return -1;
-};
-
-export const problem: Problem<Input, Output> = {
+export const problem: ProblemDefinition<Input, Output> = {
   id: "freq-002",
   title: "First Unique Character in a String",
   description: `Given a string s, find the first non-repeating character in it and return its index. If it does not exist, return -1.
@@ -90,6 +65,4 @@ Constraints:
       description: "All characters appear twice",
     },
   ],
-  solution,
-  referenceSolution,
 };

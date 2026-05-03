@@ -1,22 +1,27 @@
-import { bstProblems } from "./binary-search-tree/index.ts";
-import { frequencyProblems } from "./frequency/index.ts";
-import { prefixSumProblems } from "./prefix-sum/index.ts";
-import { slidingWindowProblems } from "./sliding-window/index.ts";
+import { bstProblemDefinitions } from "./binary-search-tree/index.ts";
+import { frequencyProblemDefinitions } from "./frequency/index.ts";
+import { prefixSumProblemDefinitions } from "./prefix-sum/index.ts";
+import { slidingWindowProblemDefinitions } from "./sliding-window/index.ts";
 
-export const allProblems = [
-  ...bstProblems,
-  ...frequencyProblems,
-  ...prefixSumProblems,
-  ...slidingWindowProblems,
+export const allProblemDefinitions = [
+  ...bstProblemDefinitions,
+  ...frequencyProblemDefinitions,
+  ...prefixSumProblemDefinitions,
+  ...slidingWindowProblemDefinitions,
 ];
 
-export const problemsByDomain = {
-  "binary-search-tree": bstProblems,
-  frequency: frequencyProblems,
-  "prefix-sum": prefixSumProblems,
-  "sliding-window": slidingWindowProblems,
+export const problemDefinitionsByDomain = {
+  "binary-search-tree": bstProblemDefinitions,
+  frequency: frequencyProblemDefinitions,
+  "prefix-sum": prefixSumProblemDefinitions,
+  "sliding-window": slidingWindowProblemDefinitions,
 };
 
-export type Domain = keyof typeof problemsByDomain;
+export type Domain = keyof typeof problemDefinitionsByDomain;
 
-export { bstProblems, frequencyProblems, prefixSumProblems, slidingWindowProblems };
+export {
+  bstProblemDefinitions,
+  frequencyProblemDefinitions,
+  prefixSumProblemDefinitions,
+  slidingWindowProblemDefinitions,
+};

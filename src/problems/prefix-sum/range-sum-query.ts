@@ -1,33 +1,9 @@
-import type { Problem } from "../../types/problem.ts";
+import type { ProblemDefinition } from "../../types/problem.ts";
 
 type Input = { nums: number[]; queries: [number, number][] };
 type Output = number[];
 
-export const solution = (input: Input): Output => {
-  // TODO: Implement your solution here
-  // Given an integer array nums, handle multiple queries of the form:
-  // Calculate the sum of elements between indices left and right inclusive.
-  // Use prefix sum for O(1) query time after O(n) preprocessing.
-  throw new Error("not implemented");
-};
-
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-  const { nums, queries } = input;
-
-  // Build prefix sum array
-  const prefixSum: number[] = [0];
-  for (let i = 0; i < nums.length; i++) {
-    prefixSum.push(prefixSum[i]! + nums[i]!);
-  }
-
-  // Answer queries in O(1) each
-  return queries.map(([left, right]) => {
-    return prefixSum[right + 1]! - prefixSum[left]!;
-  });
-};
-
-export const problem: Problem<Input, Output> = {
+export const problem: ProblemDefinition<Input, Output> = {
   id: "prefix-001",
   title: "Range Sum Query - Immutable",
   description: `Given an integer array nums, handle multiple queries of the following type:
@@ -101,6 +77,4 @@ Constraints:
       description: "All same values",
     },
   ],
-  solution,
-  referenceSolution,
 };

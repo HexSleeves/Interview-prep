@@ -1,37 +1,10 @@
-import type { Problem } from "../../types/problem.ts";
+import type { ProblemDefinition } from "../../types/problem.ts";
 import { TreeNode, arrayToBST } from "../../types/tree.ts";
 
 type Input = { root: TreeNode | null };
 type Output = boolean;
 
-export const solution = (input: Input): Output => {
-  // TODO: Implement your solution here
-  // Given the root of a binary tree, determine if it is a valid BST.
-  // A valid BST has the property that:
-  // - The left subtree of a node contains only nodes with keys less than the node's key.
-  // - The right subtree of a node contains only nodes with keys greater than the node's key.
-  // - Both the left and right subtrees must also be binary search trees.
-  throw new Error("not implemented");
-};
-
-// Reference solution (hidden during practice)
-const referenceSolution = (input: Input): Output => {
-  const validate = (
-    node: TreeNode | null,
-    min: number,
-    max: number
-  ): boolean => {
-    if (node === null) return true;
-    if (node.val <= min || node.val >= max) return false;
-    return (
-      validate(node.left, min, node.val) && validate(node.right, node.val, max)
-    );
-  };
-
-  return validate(input.root, -Infinity, Infinity);
-};
-
-export const problem: Problem<Input, Output> = {
+export const problem: ProblemDefinition<Input, Output> = {
   id: "bst-001",
   title: "Validate Binary Search Tree",
   description: `Given the root of a binary tree, determine if it is a valid binary search tree (BST).
@@ -88,6 +61,4 @@ Example 2:
       description: "Valid larger BST",
     },
   ],
-  solution,
-  referenceSolution,
 };
