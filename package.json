@@ -6,11 +6,14 @@
   "scripts": {
     "cli": "bun run src/cli.ts",
     "list": "bun run src/cli.ts list",
-    "test": "bun run src/cli.ts run --all",
-    "test:bst": "bun run src/cli.ts run --domain binary-search-tree",
-    "test:frequency": "bun run src/cli.ts run --domain frequency",
-    "test:prefix": "bun run src/cli.ts run --domain prefix-sum",
-    "test:window": "bun run src/cli.ts run --domain sliding-window"
+    "check": "bun run src/cli.ts check --all",
+    "test:harness": "bun test",
+    "test:problems": "bun run src/cli.ts check --all",
+    "test": "bun test && bun run src/cli.ts check --all",
+    "test:bst": "bun run src/cli.ts check --domain binary-search-tree",
+    "test:frequency": "bun run src/cli.ts check --domain frequency",
+    "test:prefix": "bun run src/cli.ts check --domain prefix-sum",
+    "test:window": "bun run src/cli.ts check --domain sliding-window"
   },
   "devDependencies": {
     "@types/bun": "latest"

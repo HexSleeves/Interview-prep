@@ -7,7 +7,7 @@ export const solution = (input: Input): Output => {
   // TODO: Implement your solution here
   // Given a string s, find the length of the longest substring
   // without repeating characters.
-  throw new Error("Not implemented");
+  throw new Error("not implemented");
 };
 
 // Reference solution (hidden during practice)
@@ -99,5 +99,6 @@ Constraints:
       description: "Tricky case - 'vdf' is longest",
     },
   ],
-  solution: referenceSolution,
+  solution,
+  referenceSolution,
 };

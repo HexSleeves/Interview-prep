@@ -1,88 +1,111 @@
 # Interview Prep
 
-A TypeScript-based coding interview practice platform built with Bun. Practice problems organized by domain with instant feedback.
+A TypeScript coding interview practice harness built with Bun. Problems are organized by domain and each problem has two implementations:
+
+- `solution`: the editable learner stub you practice in.
+- `referenceSolution`: the known-good implementation used to validate the repository.
 
 ## Setup
 
 ```bash
-# Install dependencies
 bun install
 ```
 
-## Usage
+## Practice Workflow
 
-### List all problems
+1. List problems:
+
+   ```bash
+   bun run list
+   ```
+
+2. Read a prompt:
+
+   ```bash
+   bun run cli show bst-001
+   bun run cli show bst-001 --hints
+   ```
+
+3. Open the problem file in `src/problems/<domain>/`.
+4. Implement the exported `solution` function.
+5. Run your solution:
+
+   ```bash
+   bun run cli run bst-001
+   ```
+
+`run` mode executes the editable `solution`, so it is expected to fail for unsolved problems.
+
+## Validate the Repository
+
+Use `check` mode to run reference solutions:
+
 ```bash
-bun run list
+bun run cli check --all
+bun run cli check --domain frequency
+bun run cli check bst-001
 ```
 
-### List problems by domain
-```bash
-bun run cli list binary-search-tree
-bun run cli list frequency
-bun run cli list prefix-sum
-bun run cli list sliding-window
-```
+Run the full validation suite:
 
-### Run a specific problem
-```bash
-bun run cli run bst-001
-bun run cli run freq-001
-```
-
-### Run all problems in a domain
-```bash
-bun run test:bst          # Binary Search Tree problems
-bun run test:frequency    # Frequency problems
-bun run test:prefix       # Prefix Sum problems
-bun run test:window       # Sliding Window problems
-```
-
-### Run the full suite
 ```bash
 bun run test
+```
+
+`bun run test` runs Bun tests for the harness and then checks every reference solution.
+
+## CLI
+
+```bash
+bun run cli list
+bun run cli list <domain>
+bun run cli show <problem-id>
+bun run cli show <problem-id> --hints
+bun run cli run <problem-id>
+bun run cli run --domain <domain>
+bun run cli run --all
+bun run cli check <problem-id>
+bun run cli check --domain <domain>
+bun run cli check --all
 ```
 
 ## Problem Domains
 
 ### Binary Search Tree
+
 - `bst-001` - Validate Binary Search Tree (medium)
 - `bst-002` - Kth Smallest Element in a BST (medium)
 
 ### Frequency
+
 - `freq-001` - Top K Frequent Elements (medium)
 - `freq-002` - First Unique Character in a String (easy)
 
 ### Prefix Sum
+
 - `prefix-001` - Range Sum Query - Immutable (easy)
 - `prefix-002` - Subarray Sum Equals K (medium)
 
 ### Sliding Window
+
 - `window-001` - Maximum Sum Subarray of Size K (easy)
 - `window-002` - Longest Substring Without Repeating Characters (medium)
 
-## How to Practice
-
-1. Open a problem file in `src/problems/<domain>/`
-2. Find the `solution` function with the `// TODO: Implement your solution here`
-3. Implement your solution
-4. Run the problem to check your work:
-   ```bash
-   bun run cli run <problem-id>
-   ```
-
 ## Project Structure
 
-```
+```text
 src/
 ├── cli.ts                    # CLI entry point
-├── runner/                   # Test runner logic
-│   └── index.ts
+├── cli.test.ts               # CLI smoke tests
+├── runner/                   # Harness logic and tests
+│   ├── index.ts
+│   └── index.test.ts
 ├── types/                    # TypeScript type definitions
 │   ├── index.ts
 │   ├── problem.ts
 │   └── tree.ts
 └── problems/                 # Problems organized by domain
+    ├── _template.problem.ts
     ├── index.ts
     ├── binary-search-tree/
     ├── frequency/
@@ -90,9 +113,15 @@ src/
     └── sliding-window/
 ```
 
-## Adding New Problems
+## Add a Problem
 
-1. Create a new file in the appropriate domain folder
-2. Export a `problem` object conforming to `Problem<TInput, TOutput>`
-3. Add the problem to the domain's `index.ts`
-4. The problem will automatically be available in the CLI
+1. Copy `src/problems/_template.problem.ts` into the target domain folder.
+2. Fill in the `Input`, `Output`, prompt, test cases, hints, `solution`, and `referenceSolution`.
+3. Add the problem to the domain's `index.ts`.
+4. Run:
+
+   ```bash
+   bun run test
+   ```
+
+Use `compareOutput` when multiple valid outputs should be accepted, such as array answers where order does not matter.

@@ -1,4 +1,11 @@
-import type { Problem, ProblemResult, SuiteResult } from "../types/problem.ts";
+import type {
+  Problem,
+  ProblemResult,
+  RunMode,
+  RunProblemOptions,
+  SuiteResult,
+  AnyProblem,
+} from "../types/problem.ts";
 
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
@@ -23,16 +30,22 @@ function deepEqual(a: unknown, b: unknown): boolean {
 }
 
 export function runProblem<TInput, TOutput>(
-  problem: Problem<TInput, TOutput>
+  problem: Problem<TInput, TOutput>,
+  options: RunProblemOptions = {}
 ): ProblemResult {
+  const mode = options.mode ?? "solution";
+  const start = performance.now();
+  const candidate =
+    mode === "reference" ? problem.referenceSolution : problem.solution;
+  const compareOutput = problem.compareOutput ?? deepEqual;
   const failures: ProblemResult["failures"] = [];
   let passed = 0;
 
   for (let i = 0; i < problem.testCases.length; i++) {
     const testCase = problem.testCases[i]!;
     try {
-      const result = problem.solution(testCase.input);
-      if (deepEqual(result, testCase.expected)) {
+      const result = candidate(testCase.input);
+      if (compareOutput(testCase.expected, result, testCase)) {
         passed++;
       } else {
         failures.push({
@@ -47,7 +60,7 @@ export function runProblem<TInput, TOutput>(
         testCase: i + 1,
         description: testCase.description,
         expected: testCase.expected,
-        received: `Error: ${error instanceof Error ? error.message : String(error)}`,
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }
@@ -55,19 +68,26 @@ export function runProblem<TInput, TOutput>(
   return {
     problemId: problem.id,
     title: problem.title,
+    mode,
     passed,
     failed: failures.length,
     total: problem.testCases.length,
+    durationMs: performance.now() - start,
     failures,
   };
 }
 
-export function runSuite(problems: Problem<unknown, unknown>[]): SuiteResult {
+export function runSuite(
+  problems: AnyProblem[],
+  options: RunProblemOptions = {}
+): SuiteResult {
+  const mode: RunMode = options.mode ?? "solution";
+  const start = performance.now();
   const results: ProblemResult[] = [];
   let passedProblems = 0;
 
   for (const problem of problems) {
-    const result = runProblem(problem);
+    const result = runProblem(problem, { mode });
     results.push(result);
     if (result.failed === 0) {
       passedProblems++;
@@ -75,9 +95,11 @@ export function runSuite(problems: Problem<unknown, unknown>[]): SuiteResult {
   }
 
   return {
+    mode,
     totalProblems: problems.length,
     passedProblems,
     failedProblems: problems.length - passedProblems,
+    durationMs: performance.now() - start,
     results,
   };
 }
@@ -86,9 +108,9 @@ export function formatProblemResult(result: ProblemResult): string {
   const status = result.failed === 0 ? "✓ PASSED" : "✗ FAILED";
   const lines: string[] = [
     `\n${"=".repeat(60)}`,
-    `${status} | ${result.title} (${result.problemId})`,
+    `${status} | ${result.title} (${result.problemId}) | mode: ${result.mode}`,
     `${"=".repeat(60)}`,
-    `Tests: ${result.passed}/${result.total} passed`,
+    `Tests: ${result.passed}/${result.total} passed (${result.durationMs.toFixed(1)}ms)`,
   ];
 
   if (result.failures.length > 0) {
@@ -96,7 +118,11 @@ export function formatProblemResult(result: ProblemResult): string {
     for (const failure of result.failures) {
       lines.push(`\n  Test #${failure.testCase}${failure.description ? ` - ${failure.description}` : ""}`);
       lines.push(`    Expected: ${JSON.stringify(failure.expected)}`);
-      lines.push(`    Received: ${JSON.stringify(failure.received)}`);
+      if (failure.error) {
+        lines.push(`    Error: ${failure.error}`);
+      } else {
+        lines.push(`    Received: ${JSON.stringify(failure.received)}`);
+      }
     }
   }
 
@@ -113,7 +139,9 @@ export function formatSuiteResult(result: SuiteResult): string {
   lines.push(`\n${"=".repeat(60)}`);
   lines.push("SUITE SUMMARY");
   lines.push(`${"=".repeat(60)}`);
+  lines.push(`Mode: ${result.mode}`);
   lines.push(`Problems: ${result.passedProblems}/${result.totalProblems} passed`);
+  lines.push(`Duration: ${result.durationMs.toFixed(1)}ms`);
 
   if (result.failedProblems > 0) {
     lines.push("\nFailed problems:");

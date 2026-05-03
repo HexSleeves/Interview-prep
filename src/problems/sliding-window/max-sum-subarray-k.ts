@@ -7,7 +7,7 @@ export const solution = (input: Input): Output => {
   // TODO: Implement your solution here
   // Given an array of integers nums and an integer k, find the maximum sum
   // of any contiguous subarray of size k.
-  throw new Error("Not implemented");
+  throw new Error("not implemented");
 };
 
 // Reference solution (hidden during practice)
@@ -89,5 +89,6 @@ Constraints:
       description: "Max sum at the end",
     },
   ],
-  solution: referenceSolution,
+  solution,
+  referenceSolution,
 };

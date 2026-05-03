@@ -8,7 +8,7 @@ export const solution = (input: Input): Output => {
   // TODO: Implement your solution here
   // Given the root of a BST and an integer k, return the kth smallest value (1-indexed).
   // You may assume k is always valid (1 <= k <= n where n is the number of nodes).
-  throw new Error("Not implemented");
+  throw new Error("not implemented");
 };
 
 // Reference solution (hidden during practice)
@@ -78,5 +78,6 @@ Constraints:
       description: "Find root value",
     },
   ],
-  solution: referenceSolution,
+  solution,
+  referenceSolution,
 };

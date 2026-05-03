@@ -11,7 +11,7 @@ export const solution = (input: Input): Output => {
   // - The left subtree of a node contains only nodes with keys less than the node's key.
   // - The right subtree of a node contains only nodes with keys greater than the node's key.
   // - Both the left and right subtrees must also be binary search trees.
-  throw new Error("Not implemented");
+  throw new Error("not implemented");
 };
 
 // Reference solution (hidden during practice)
@@ -88,5 +88,6 @@ Example 2:
       description: "Valid larger BST",
     },
   ],
-  solution: referenceSolution,
+  solution,
+  referenceSolution,
 };

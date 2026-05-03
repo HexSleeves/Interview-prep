@@ -8,7 +8,7 @@ export const solution = (input: Input): Output => {
   // Given an integer array nums, handle multiple queries of the form:
   // Calculate the sum of elements between indices left and right inclusive.
   // Use prefix sum for O(1) query time after O(n) preprocessing.
-  throw new Error("Not implemented");
+  throw new Error("not implemented");
 };
 
 // Reference solution (hidden during practice)
@@ -101,5 +101,6 @@ Constraints:
       description: "All same values",
     },
   ],
-  solution: referenceSolution,
+  solution,
+  referenceSolution,
 };

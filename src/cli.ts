@@ -1,15 +1,15 @@
 import {
-  runProblem,
-  runSuite,
   formatProblemResult,
   formatSuiteResult,
+  runProblem,
+  runSuite,
 } from "./runner/index.ts";
 import {
   allProblems,
   problemsByDomain,
   type Domain,
 } from "./problems/index.ts";
-import type { Problem } from "./types/problem.ts";
+import type { AnyProblem, RunMode } from "./types/problem.ts";
 
 const DOMAINS = Object.keys(problemsByDomain) as Domain[];
 
@@ -18,70 +18,111 @@ function printHelp(): void {
 Interview Prep CLI - Practice coding interview problems
 
 Usage:
-  bun run cli.ts [command] [options]
+  bun run cli <command> [options]
 
 Commands:
   list                          List all available problems
   list <domain>                 List problems in a specific domain
-  run <problem-id>              Run a specific problem by ID
-  run --domain <domain>         Run all problems in a domain
-  run --all                     Run all problems (full suite)
+  show <problem-id>             Show a problem prompt
+  show <problem-id> --hints     Show a problem prompt with hints
+  run <problem-id>              Run editable learner solution
+  run --domain <domain>         Run editable learner solutions in a domain
+  run --all                     Run all editable learner solutions
+  check <problem-id>            Run reference solution
+  check --domain <domain>       Run reference solutions in a domain
+  check --all                   Run all reference solutions
 
 Available domains:
   ${DOMAINS.join(", ")}
 
 Examples:
-  bun run cli.ts list
-  bun run cli.ts list sliding-window
-  bun run cli.ts run bst-001
-  bun run cli.ts run --domain frequency
-  bun run cli.ts run --all
+  bun run cli list
+  bun run cli list sliding-window
+  bun run cli show bst-001 --hints
+  bun run cli run bst-001
+  bun run cli check --domain frequency
+  bun run cli check --all
 `);
+}
+
+function fail(message: string, details?: string): never {
+  console.error(message);
+  if (details) {
+    console.error(details);
+  }
+  process.exit(1);
+}
+
+function getDomain(domain: string): Domain {
+  if (!DOMAINS.includes(domain as Domain)) {
+    fail(`Unknown domain: ${domain}`, `Available domains: ${DOMAINS.join(", ")}`);
+  }
+
+  return domain as Domain;
+}
+
+function getProblemById(id: string): AnyProblem {
+  const problem = allProblems.find((candidate) => candidate.id === id);
+  if (!problem) {
+    fail(`Problem not found: ${id}`, "Use 'bun run cli list' to see available problems.");
+  }
+
+  return problem;
 }
 
 function listProblems(domain?: string): void {
   if (domain) {
-    if (!DOMAINS.includes(domain as Domain)) {
-      console.error(`Unknown domain: ${domain}`);
-      console.log(`Available domains: ${DOMAINS.join(", ")}`);
-      process.exit(1);
-    }
+    const validDomain = getDomain(domain);
+    const problems = problemsByDomain[validDomain];
+    console.log(`\nProblems in "${validDomain}":\n`);
+    printProblemRows(problems);
+    console.log("");
+    return;
+  }
 
-    const problems = problemsByDomain[domain as Domain];
-    console.log(`\nProblems in "${domain}":\n`);
-    for (const problem of problems) {
-      console.log(
-        `  ${problem.id.padEnd(12)} | ${problem.difficulty.padEnd(6)} | ${problem.title}`
-      );
-    }
-  } else {
-    console.log("\nAll Available Problems:\n");
-    for (const [domainName, problems] of Object.entries(problemsByDomain)) {
-      console.log(`\n${domainName.toUpperCase()}`);
-      console.log("-".repeat(50));
-      for (const problem of problems) {
-        console.log(
-          `  ${problem.id.padEnd(12)} | ${problem.difficulty.padEnd(6)} | ${problem.title}`
-        );
-      }
-    }
+  console.log("\nAll Available Problems:");
+  for (const [domainName, problems] of Object.entries(problemsByDomain)) {
+    console.log(`\n${domainName.toUpperCase()}`);
+    console.log("-".repeat(50));
+    printProblemRows(problems);
   }
   console.log("");
 }
 
-function findProblemById(id: string): Problem<unknown, unknown> | undefined {
-  return allProblems.find((p) => p.id === id);
+function printProblemRows(problems: readonly AnyProblem[]): void {
+  for (const problem of problems) {
+    console.log(
+      `  ${problem.id.padEnd(12)} | ${problem.difficulty.padEnd(6)} | ${problem.title}`
+    );
+  }
 }
 
-function runProblemById(id: string): void {
-  const problem = findProblemById(id);
-  if (!problem) {
-    console.error(`Problem not found: ${id}`);
-    console.log("Use 'bun run cli.ts list' to see available problems.");
-    process.exit(1);
+function showProblem(id: string | undefined, flags: string[]): void {
+  if (!id) {
+    fail("Please specify a problem ID.");
   }
 
-  const result = runProblem(problem);
+  const problem = getProblemById(id);
+  const showHints = flags.includes("--hints");
+
+  console.log(`\n${problem.title} (${problem.id})`);
+  console.log(`${"=".repeat(problem.title.length + problem.id.length + 3)}`);
+  console.log(`Difficulty: ${problem.difficulty}`);
+  console.log(`Tags: ${problem.tags.join(", ")}`);
+  console.log(`\n${problem.description}`);
+
+  if (showHints && problem.hints && problem.hints.length > 0) {
+    console.log("\nHints:");
+    for (const hint of problem.hints) {
+      console.log(`  - ${hint}`);
+    }
+  }
+
+  console.log("");
+}
+
+function runProblemById(id: string, mode: RunMode): void {
+  const result = runProblem(getProblemById(id), { mode });
   console.log(formatProblemResult(result));
 
   if (result.failed > 0) {
@@ -89,17 +130,12 @@ function runProblemById(id: string): void {
   }
 }
 
-function runDomain(domain: string): void {
-  if (!DOMAINS.includes(domain as Domain)) {
-    console.error(`Unknown domain: ${domain}`);
-    console.log(`Available domains: ${DOMAINS.join(", ")}`);
-    process.exit(1);
-  }
+function runDomain(domain: string, mode: RunMode): void {
+  const validDomain = getDomain(domain);
+  const problems = problemsByDomain[validDomain];
+  console.log(`\nRunning ${mode} mode for "${validDomain}"...\n`);
 
-  const problems = problemsByDomain[domain as Domain];
-  console.log(`\nRunning all problems in "${domain}"...\n`);
-
-  const result = runSuite(problems);
+  const result = runSuite(problems, { mode });
   console.log(formatSuiteResult(result));
 
   if (result.failedProblems > 0) {
@@ -107,10 +143,10 @@ function runDomain(domain: string): void {
   }
 }
 
-function runAll(): void {
-  console.log("\nRunning full problem suite...\n");
+function runAll(mode: RunMode): void {
+  console.log(`\nRunning ${mode} mode for all problems...\n`);
 
-  const result = runSuite(allProblems);
+  const result = runSuite(allProblems, { mode });
   console.log(formatSuiteResult(result));
 
   if (result.failedProblems > 0) {
@@ -118,7 +154,28 @@ function runAll(): void {
   }
 }
 
-// Parse command line arguments
+function runCommand(args: string[], mode: RunMode): void {
+  if (args[0] === "--all") {
+    runAll(mode);
+    return;
+  }
+
+  if (args[0] === "--domain") {
+    if (!args[1]) {
+      fail("Please specify a domain.", `Available domains: ${DOMAINS.join(", ")}`);
+    }
+    runDomain(args[1], mode);
+    return;
+  }
+
+  if (args[0]) {
+    runProblemById(args[0], mode);
+    return;
+  }
+
+  fail("Please specify a problem ID, --domain <domain>, or --all");
+}
+
 const args = process.argv.slice(2);
 
 if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
@@ -126,34 +183,25 @@ if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
   process.exit(0);
 }
 
-const command = args[0];
+const [command, ...commandArgs] = args;
 
 switch (command) {
   case "list":
-    listProblems(args[1]);
+    listProblems(commandArgs[0]);
+    break;
+
+  case "show":
+    showProblem(commandArgs[0], commandArgs.slice(1));
     break;
 
   case "run":
-    if (args[1] === "--all") {
-      runAll();
-    } else if (args[1] === "--domain") {
-      if (!args[2]) {
-        console.error("Please specify a domain.");
-        console.log(`Available domains: ${DOMAINS.join(", ")}`);
-        process.exit(1);
-      }
-      runDomain(args[2]);
-    } else if (args[1]) {
-      runProblemById(args[1]);
-    } else {
-      console.error("Please specify a problem ID, --domain <domain>, or --all");
-      printHelp();
-      process.exit(1);
-    }
+    runCommand(commandArgs, "solution");
+    break;
+
+  case "check":
+    runCommand(commandArgs, "reference");
     break;
 
   default:
-    console.error(`Unknown command: ${command}`);
-    printHelp();
-    process.exit(1);
+    fail(`Unknown command: ${command}`);
 }

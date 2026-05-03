@@ -7,7 +7,7 @@ export const solution = (input: Input): Output => {
   // TODO: Implement your solution here
   // Given an integer array nums and an integer k, return the k most frequent elements.
   // You may return the answer in any order.
-  throw new Error("Not implemented");
+  throw new Error("not implemented");
 };
 
 // Reference solution (hidden during practice)
@@ -96,5 +96,7 @@ Follow up: Your algorithm's time complexity must be better than O(n log n).`,
       description: "Return top 3 frequent",
     },
   ],
-  solution: referenceSolution,
+  solution,
+  referenceSolution,
+  compareOutput,
 };
