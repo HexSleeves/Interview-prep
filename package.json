@@ -1,24 +1,33 @@
 {
   "name": "interview-prep",
-  "module": "src/cli.ts",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "module": "src/cli.ts",
   "scripts": {
     "run": "bun . run",
     "init:solutions": "bun scripts/init-solutions.ts",
+    "new-problem": "bun scripts/new-problem.ts",
     "cli": "bun .",
     "list": "bun . list",
     "check": "bun . check --all",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint . --deny-warnings",
+    "lint:fix": "oxlint . --fix",
+    "typecheck": "bunx tsc --noEmit",
+    "docs:problems": "bun scripts/generate-problem-docs.ts",
     "test:harness": "bun test",
     "test:problems": "bun . check --all",
-    "test": "bun test && bun . check --all",
+    "test": "bun run format:check && bun run lint && bun run typecheck && bun test && bun . check --all",
     "test:bst": "bun . check --domain binary-search-tree",
     "test:frequency": "bun . check --domain frequency",
     "test:prefix": "bun . check --domain prefix-sum",
     "test:window": "bun . check --domain sliding-window"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "oxfmt": "^0.47.0",
+    "oxlint": "^1.62.0"
   },
   "peerDependencies": {
     "typescript": "^5"

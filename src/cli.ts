@@ -1,4 +1,13 @@
-import { formatProblemResult, formatSuiteResult, runProblem, runSuite } from "./runner/index.ts";
+import {
+  benchmarkProblem,
+  benchmarkSuite,
+  formatBenchmarkProblemResult,
+  formatBenchmarkSuiteResult,
+  formatProblemResult,
+  formatSuiteResult,
+  runProblem,
+  runSuite,
+} from "./runner/index.ts";
 import { allProblems, problemsByDomain, type Domain } from "./registry/index.ts";
 import type { AnyProblem, RunMode } from "./types/problem.ts";
 
@@ -24,6 +33,9 @@ Commands:
   check --domain <domain>       Run reference solutions in a domain
   check --all                   Run all reference solutions
   check <problem-id> --solution <solution-id>
+  bench <problem-id>            Benchmark reference solutions
+  bench --domain <domain>       Benchmark reference solutions in a domain
+  bench --all                   Benchmark all reference solutions
 
 Available domains:
   ${DOMAINS.join(", ")}
@@ -36,6 +48,7 @@ Examples:
   bun . run bst-001
   bun . check --domain frequency
   bun . check freq-001 --solution optimized
+  bun . bench freq-001 --solution optimized
   bun . check --all
 `);
 }
@@ -46,6 +59,14 @@ function fail(message: string, details?: string): never {
     console.error(details);
   }
   process.exit(1);
+}
+
+function runOrFail(action: () => void): void {
+  try {
+    action();
+  } catch (error) {
+    fail(error instanceof Error ? error.message : String(error));
+  }
 }
 
 function getDomain(domain: string): Domain {
@@ -121,9 +142,7 @@ function showProblem(id: string | undefined, flags: string[]): void {
       ]
         .filter(Boolean)
         .join(", ");
-      console.log(
-        `  - ${solution.id}: ${solution.title}${complexity ? ` (${complexity})` : ""}`
-      );
+      console.log(`  - ${solution.id}: ${solution.title}${complexity ? ` (${complexity})` : ""}`);
       if (solution.description) {
         console.log(`    ${solution.description}`);
       }
@@ -191,9 +210,48 @@ function runCommand(args: string[], mode: RunMode): void {
   fail("Please specify a problem ID, --domain <domain>, or --all");
 }
 
+function benchCommand(args: string[]): void {
+  const solutionId = getFlagValue(args, "--solution");
+  const positionalArgs = removeFlagWithValue(args, "--solution");
+
+  if (positionalArgs[0] === "--all") {
+    console.log(formatBenchmarkSuiteResult(benchmarkSuite(allProblems, { solutionId })));
+    return;
+  }
+
+  if (positionalArgs[0] === "--domain") {
+    if (!positionalArgs[1]) {
+      fail("Please specify a domain.", `Available domains: ${DOMAINS.join(", ")}`);
+    }
+    const domain = getDomain(positionalArgs[1]);
+    console.log(
+      formatBenchmarkSuiteResult(benchmarkSuite(problemsByDomain[domain], { solutionId })),
+    );
+    return;
+  }
+
+  if (positionalArgs[0]) {
+    console.log(
+      formatBenchmarkProblemResult(
+        benchmarkProblem(getProblemById(positionalArgs[0]), { solutionId }),
+      ),
+    );
+    return;
+  }
+
+  fail("Please specify a problem ID, --domain <domain>, or --all");
+}
+
 function getFlagValue(args: string[], flag: string): string | undefined {
   const index = args.indexOf(flag);
-  return index === -1 ? undefined : args[index + 1];
+  if (index === -1) return undefined;
+
+  const value = args[index + 1];
+  if (!value || value.startsWith("--")) {
+    fail(`Please specify a value for ${flag}.`);
+  }
+
+  return value;
 }
 
 function removeFlagWithValue(args: string[], flag: string): string[] {
@@ -221,11 +279,15 @@ switch (command) {
     break;
 
   case "run":
-    runCommand(commandArgs, "solution");
+    runOrFail(() => runCommand(commandArgs, "solution"));
     break;
 
   case "check":
-    runCommand(commandArgs, "reference");
+    runOrFail(() => runCommand(commandArgs, "reference"));
+    break;
+
+  case "bench":
+    runOrFail(() => benchCommand(commandArgs));
     break;
 
   default:

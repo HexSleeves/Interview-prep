@@ -1,5 +1,7 @@
 import type {
   AnyProblem,
+  BenchmarkProblemResult,
+  BenchmarkSuiteResult,
   Problem,
   ProblemResult,
   RunMode,
@@ -46,7 +48,24 @@ export function runProblem<TInput, TOutput>(
       const testCase = problem.testCases[i]!;
       try {
         const result = candidate.implementation(testCase.input);
-        if (compareOutput(testCase.expected, result, testCase)) {
+        let matches = false;
+
+        try {
+          matches = compareOutput(testCase.expected, result, testCase);
+        } catch (error) {
+          failures.push({
+            solutionId: candidate.id,
+            solutionTitle: candidate.title,
+            testCase: i + 1,
+            description: testCase.description,
+            expected: testCase.expected,
+            received: result,
+            comparatorError: error instanceof Error ? error.message : String(error),
+          });
+          continue;
+        }
+
+        if (matches) {
           passed++;
         } else {
           failures.push({
@@ -102,7 +121,16 @@ function getCandidates<TInput, TOutput>(
 
   if (!solutionId) return candidates;
 
-  return candidates.filter((candidate) => candidate.id === solutionId);
+  const filteredCandidates = candidates.filter((candidate) => candidate.id === solutionId);
+  if (filteredCandidates.length === 0) {
+    throw new Error(
+      `Unknown solution "${solutionId}" for ${problem.id}. Available: ${candidates
+        .map((candidate) => candidate.id)
+        .join(", ")}`,
+    );
+  }
+
+  return filteredCandidates;
 }
 
 export function runSuite(problems: AnyProblem[], options: RunProblemOptions = {}): SuiteResult {
@@ -112,7 +140,7 @@ export function runSuite(problems: AnyProblem[], options: RunProblemOptions = {}
   let passedProblems = 0;
 
   for (const problem of problems) {
-    const result = runProblem(problem, { mode });
+    const result = runProblem(problem, { mode, solutionId: options.solutionId });
     results.push(result);
     if (result.failed === 0) {
       passedProblems++;
@@ -126,6 +154,67 @@ export function runSuite(problems: AnyProblem[], options: RunProblemOptions = {}
     failedProblems: problems.length - passedProblems,
     durationMs: performance.now() - start,
     results,
+  };
+}
+
+export function benchmarkProblem<TInput, TOutput>(
+  problem: Problem<TInput, TOutput>,
+  options: RunProblemOptions = {},
+): BenchmarkProblemResult {
+  const candidates = getCandidates(problem, "reference", options.solutionId);
+  const benchmarkCases =
+    problem.benchmarkCases ??
+    problem.testCases.map((testCase) => ({
+      input: testCase.input,
+      description: testCase.description,
+      iterations: 1,
+    }));
+  const results: BenchmarkProblemResult["results"] = [];
+
+  for (const candidate of candidates) {
+    for (let i = 0; i < benchmarkCases.length; i++) {
+      const benchmarkCase = benchmarkCases[i]!;
+      const iterations = benchmarkCase.iterations ?? 1;
+      const start = performance.now();
+      let error: string | undefined;
+
+      try {
+        for (let iteration = 0; iteration < iterations; iteration++) {
+          candidate.implementation(benchmarkCase.input);
+        }
+      } catch (caughtError) {
+        error = caughtError instanceof Error ? caughtError.message : String(caughtError);
+      }
+
+      const durationMs = performance.now() - start;
+      results.push({
+        solutionId: candidate.id,
+        solutionTitle: candidate.title,
+        benchmarkCase: i + 1,
+        description: benchmarkCase.description,
+        iterations,
+        durationMs,
+        averageMs: durationMs / iterations,
+        error,
+      });
+    }
+  }
+
+  return {
+    problemId: problem.id,
+    title: problem.title,
+    solutionCount: candidates.length,
+    results,
+  };
+}
+
+export function benchmarkSuite(
+  problems: AnyProblem[],
+  options: RunProblemOptions = {},
+): BenchmarkSuiteResult {
+  return {
+    totalProblems: problems.length,
+    results: problems.map((problem) => benchmarkProblem(problem, options)),
   };
 }
 
@@ -143,17 +232,43 @@ export function formatProblemResult(result: ProblemResult): string {
     lines.push("\nFailed test cases:");
     for (const failure of result.failures) {
       lines.push(`\n  Solution: ${failure.solutionTitle} (${failure.solutionId})`);
-      lines.push(`\n  Test #${failure.testCase}${failure.description ? ` - ${failure.description}` : ""}`);
-      lines.push(`    Expected: ${JSON.stringify(failure.expected)}`);
-      if (failure.error) {
+      lines.push(
+        `\n  Test #${failure.testCase}${failure.description ? ` - ${failure.description}` : ""}`,
+      );
+      lines.push(`    Expected: ${formatValue(failure.expected)}`);
+      if (failure.comparatorError) {
+        lines.push(`    Comparator error: ${failure.comparatorError}`);
+        lines.push(`    Received: ${formatValue(failure.received)}`);
+      } else if (failure.error) {
         lines.push(`    Error: ${failure.error}`);
       } else {
-        lines.push(`    Received: ${JSON.stringify(failure.received)}`);
+        lines.push(`    Received: ${formatValue(failure.received)}`);
       }
     }
   }
 
   return lines.join("\n");
+}
+
+function formatValue(value: unknown): string {
+  if (value === undefined) return "undefined";
+  if (typeof value === "string") return JSON.stringify(value);
+
+  try {
+    const seen = new WeakSet<object>();
+    const formatted = JSON.stringify(value, (_key, nestedValue: unknown) => {
+      if (typeof nestedValue === "object" && nestedValue !== null) {
+        if (seen.has(nestedValue)) return "[Circular]";
+        seen.add(nestedValue);
+      }
+
+      return nestedValue;
+    });
+
+    return formatted ?? String(value);
+  } catch {
+    return String(value);
+  }
 }
 
 export function formatSuiteResult(result: SuiteResult): string {
@@ -179,5 +294,34 @@ export function formatSuiteResult(result: SuiteResult): string {
     }
   }
 
+  return lines.join("\n");
+}
+
+export function formatBenchmarkProblemResult(result: BenchmarkProblemResult): string {
+  const lines = [
+    `\n${"=".repeat(60)}`,
+    `BENCHMARK | ${result.title} (${result.problemId})`,
+    `${"=".repeat(60)}`,
+    `Solutions: ${result.solutionCount}`,
+  ];
+
+  for (const benchmarkResult of result.results) {
+    lines.push(
+      `  ${benchmarkResult.solutionId.padEnd(12)} | case ${String(benchmarkResult.benchmarkCase).padEnd(2)} | ${benchmarkResult.averageMs.toFixed(4)}ms avg | ${benchmarkResult.iterations} iterations${benchmarkResult.description ? ` | ${benchmarkResult.description}` : ""}`,
+    );
+    if (benchmarkResult.error) {
+      lines.push(`    Error: ${benchmarkResult.error}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+export function formatBenchmarkSuiteResult(result: BenchmarkSuiteResult): string {
+  const lines = result.results.map(formatBenchmarkProblemResult);
+  lines.push(`\n${"=".repeat(60)}`);
+  lines.push("BENCHMARK SUMMARY");
+  lines.push(`${"=".repeat(60)}`);
+  lines.push(`Problems: ${result.totalProblems}`);
   return lines.join("\n");
 }

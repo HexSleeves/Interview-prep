@@ -57,4 +57,37 @@ describe("cli", () => {
     expect(result.stdout).toContain("optimized");
     expect(result.stdout).not.toContain("const freqMap");
   });
+
+  test("check domain can filter by solution id", async () => {
+    const result = await cli("check", "--domain", "frequency", "--solution", "optimized");
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Problems: 2/2 passed");
+    expect(result.stdout).toContain("Solutions: 1");
+    expect(result.stdout).not.toContain("Solutions: 2");
+  });
+
+  test("unknown solution ids exit nonzero with available options", async () => {
+    const result = await cli("check", "freq-001", "--solution", "missing");
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Unknown solution "missing" for freq-001');
+    expect(result.stderr).toContain("Available: brute-force, optimized");
+  });
+
+  test("missing solution flag value exits nonzero", async () => {
+    const result = await cli("check", "freq-001", "--solution");
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("Please specify a value for --solution.");
+  });
+
+  test("bench can run a single problem", async () => {
+    const result = await cli("bench", "freq-001", "--solution", "optimized");
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("BENCHMARK");
+    expect(result.stdout).toContain("freq-001");
+    expect(result.stdout).toContain("optimized");
+  });
 });

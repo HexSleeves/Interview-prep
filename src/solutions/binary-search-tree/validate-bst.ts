@@ -3,7 +3,7 @@ import { TreeNode } from "../../types/tree.ts";
 type Input = { root: TreeNode | null };
 type Output = boolean;
 
-export const solution = (input: Input): Output => {
+export const solution = (_input: Input): Output => {
   // TODO: Implement your solution here
   // Given the root of a binary tree, determine if it is a valid BST.
   // A valid BST has the property that:

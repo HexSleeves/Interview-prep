@@ -3,16 +3,9 @@ import { solution as topKFrequentSolution } from "../solutions/frequency/top-k-f
 import { referenceSolutions as topKFrequentReferences } from "../reference/frequency/top-k-frequent.ts";
 import { solution as firstUniqueCharSolution } from "../solutions/frequency/first-unique-char.ts";
 import { referenceSolutions as firstUniqueCharReferences } from "../reference/frequency/first-unique-char.ts";
+import { composeProblem } from "./compose.ts";
 
 export const frequencyProblems = [
-  {
-    ...topKFrequent,
-    solution: topKFrequentSolution,
-    referenceSolutions: topKFrequentReferences,
-  },
-  {
-    ...firstUniqueChar,
-    solution: firstUniqueCharSolution,
-    referenceSolutions: firstUniqueCharReferences,
-  },
+  composeProblem(topKFrequent, topKFrequentSolution, topKFrequentReferences),
+  composeProblem(firstUniqueChar, firstUniqueCharSolution, firstUniqueCharReferences),
 ];

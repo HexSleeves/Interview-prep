@@ -74,6 +74,20 @@ bun run test
 
 `bun run test` runs Bun tests for the harness and then checks every reference solution.
 
+## Formatting and Linting
+
+This project uses Oxc tooling:
+
+```bash
+bun run format        # format with oxfmt
+bun run format:check  # verify formatting
+bun run lint          # lint with oxlint
+bun run lint:fix      # apply safe oxlint fixes
+bun run typecheck     # run TypeScript checks
+```
+
+`bun run test` runs formatting, linting, typechecking, Bun tests, and all reference solution checks.
+
 ## CLI
 
 ```bash
@@ -89,9 +103,14 @@ bun . check <problem-id>
 bun . check <problem-id> --solution <solution-id>
 bun . check --domain <domain>
 bun . check --all
+bun . bench <problem-id>
+bun . bench --domain <domain>
+bun . bench --all
 ```
 
 ## Problem Domains
+
+<!-- problems:start -->
 
 ### Binary Search Tree
 
@@ -112,6 +131,8 @@ bun . check --all
 
 - `window-001` - Maximum Sum Subarray of Size K (easy)
 - `window-002` - Longest Substring Without Repeating Characters (medium)
+
+<!-- problems:end -->
 
 ## Project Structure
 
@@ -153,3 +174,9 @@ src/
    ```
 
 Use `compareOutput` when multiple valid outputs should be accepted, such as array answers where order does not matter.
+
+You can also create the initial file scaffold with:
+
+```bash
+bun run new-problem frequency example-problem
+```
