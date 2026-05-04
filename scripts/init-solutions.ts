@@ -65,7 +65,7 @@ async function main(): Promise<void> {
       [
         "Worktree has uncommitted changes.",
         "Commit or stash them before creating/switching to the solutions branch so main stays clean.",
-      ].join("\n")
+      ].join("\n"),
     );
   }
 

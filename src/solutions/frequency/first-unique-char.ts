@@ -2,8 +2,16 @@ type Input = { s: string };
 type Output = number;
 
 export const solution = (input: Input): Output => {
-  // TODO: Implement your solution here
-  // Given a string s, find the first non-repeating character and return its index.
-  // If it does not exist, return -1.
-  throw new Error("not implemented");
+  const freq: Record<string, number> = {};
+  for (let i = 0; i < input.s.length; i++) {
+    const char = input.s[i]!;
+    freq[char] = (freq[char] ?? 0) + 1;
+  }
+
+  for (let i = 0; i < input.s.length; i++) {
+    const char = input.s[i]!;
+    if (freq[char] === 1) return i;
+  }
+
+  return -1;
 };
