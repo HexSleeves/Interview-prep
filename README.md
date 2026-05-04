@@ -103,9 +103,14 @@ bun . check <problem-id>
 bun . check <problem-id> --solution <solution-id>
 bun . check --domain <domain>
 bun . check --all
+bun . bench <problem-id>
+bun . bench --domain <domain>
+bun . bench --all
 ```
 
 ## Problem Domains
+
+<!-- problems:start -->
 
 ### Binary Search Tree
 
@@ -126,6 +131,8 @@ bun . check --all
 
 - `window-001` - Maximum Sum Subarray of Size K (easy)
 - `window-002` - Longest Substring Without Repeating Characters (medium)
+
+<!-- problems:end -->
 
 ## Project Structure
 
@@ -167,3 +174,9 @@ src/
    ```
 
 Use `compareOutput` when multiple valid outputs should be accepted, such as array answers where order does not matter.
+
+You can also create the initial file scaffold with:
+
+```bash
+bun run new-problem frequency example-problem
+```

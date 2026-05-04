@@ -6,6 +6,7 @@
   "scripts": {
     "run": "bun . run",
     "init:solutions": "bun scripts/init-solutions.ts",
+    "new-problem": "bun scripts/new-problem.ts",
     "cli": "bun .",
     "list": "bun . list",
     "check": "bun . check --all",
@@ -14,6 +15,7 @@
     "lint": "oxlint . --deny-warnings",
     "lint:fix": "oxlint . --fix",
     "typecheck": "bunx tsc --noEmit",
+    "docs:problems": "bun scripts/generate-problem-docs.ts",
     "test:harness": "bun test",
     "test:problems": "bun . check --all",
     "test": "bun run format:check && bun run lint && bun run typecheck && bun test && bun . check --all",

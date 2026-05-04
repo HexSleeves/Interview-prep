@@ -4,6 +4,12 @@ export interface TestCase<TInput, TOutput> {
   description?: string;
 }
 
+export interface BenchmarkCase<TInput> {
+  input: TInput;
+  description?: string;
+  iterations?: number;
+}
+
 export type Solution<TInput, TOutput> = (input: TInput) => TOutput;
 
 export interface SolutionVariant<TInput, TOutput> {
@@ -28,6 +34,7 @@ export interface ProblemDefinition<TInput, TOutput> {
   difficulty: "easy" | "medium" | "hard";
   tags: string[];
   testCases: TestCase<TInput, TOutput>[];
+  benchmarkCases?: BenchmarkCase<TInput>[];
   compareOutput?: CompareOutput<TOutput, TInput>;
   hints?: string[];
 }
@@ -55,6 +62,7 @@ export interface TestFailure {
   expected: unknown;
   received?: unknown;
   error?: string;
+  comparatorError?: string;
 }
 
 export interface ProblemResult {
@@ -76,4 +84,27 @@ export interface SuiteResult {
   failedProblems: number;
   durationMs: number;
   results: ProblemResult[];
+}
+
+export interface BenchmarkSolutionResult {
+  solutionId: string;
+  solutionTitle: string;
+  benchmarkCase: number;
+  description?: string;
+  iterations: number;
+  durationMs: number;
+  averageMs: number;
+  error?: string;
+}
+
+export interface BenchmarkProblemResult {
+  problemId: string;
+  title: string;
+  solutionCount: number;
+  results: BenchmarkSolutionResult[];
+}
+
+export interface BenchmarkSuiteResult {
+  totalProblems: number;
+  results: BenchmarkProblemResult[];
 }

@@ -1,6 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import type { Problem } from "../types/problem.ts";
-import { formatProblemResult, formatSuiteResult, runProblem, runSuite } from "./index.ts";
+import type { Problem, SolutionVariant } from "../types/problem.ts";
+import {
+  benchmarkProblem,
+  benchmarkSuite,
+  formatBenchmarkSuiteResult,
+  formatProblemResult,
+  formatSuiteResult,
+  runProblem,
+  runSuite,
+} from "./index.ts";
 
 const passingProblem: Problem<number, number> = {
   id: "sample-001",
@@ -99,6 +107,12 @@ describe("runProblem", () => {
     expect(result.failed).toBe(0);
   });
 
+  test("throws a helpful error for unknown reference solution ids", () => {
+    expect(() => runProblem(passingProblem, { mode: "reference", solutionId: "missing" })).toThrow(
+      'Unknown solution "missing" for sample-001. Available: triple',
+    );
+  });
+
   test("reports failed expected and received values", () => {
     const result = runProblem({
       ...passingProblem,
@@ -157,6 +171,19 @@ describe("runProblem", () => {
     expect(result.failed).toBe(0);
     expect(result.passed).toBe(1);
   });
+
+  test("reports comparator errors separately from solution errors", () => {
+    const result = runProblem({
+      ...passingProblem,
+      compareOutput: () => {
+        throw new Error("bad comparator");
+      },
+    });
+
+    expect(result.failed).toBe(2);
+    expect(result.failures[0]?.comparatorError).toBe("bad comparator");
+    expect(result.failures[0]?.error).toBeUndefined();
+  });
 });
 
 describe("runSuite", () => {
@@ -176,6 +203,71 @@ describe("runSuite", () => {
     expect(result.failedProblems).toBe(1);
     expect(result.durationMs).toBeGreaterThanOrEqual(0);
   });
+
+  test("passes solution filtering through to each problem", () => {
+    const referenceSolutions: SolutionVariant<number, number>[] = [
+      {
+        id: "wrong",
+        title: "Wrong",
+        implementation: (input) => input * 3,
+      },
+      {
+        id: "right",
+        title: "Right",
+        implementation: (input) => input * 2,
+      },
+    ];
+
+    const result = runSuite(
+      [
+        { ...passingProblem, referenceSolutions },
+        { ...passingProblem, id: "sample-002", referenceSolutions },
+      ],
+      { mode: "reference", solutionId: "right" },
+    );
+
+    expect(result.failedProblems).toBe(0);
+    expect(result.results.every((problemResult) => problemResult.solutionCount === 1)).toBe(true);
+  });
+});
+
+describe("benchmarks", () => {
+  test("benchmarkProblem runs benchmark cases for reference solutions", () => {
+    const result = benchmarkProblem(
+      {
+        ...passingProblem,
+        benchmarkCases: [{ input: 2, iterations: 3, description: "small input" }],
+        referenceSolutions: [
+          {
+            id: "double",
+            title: "Double",
+            implementation: (input) => input * 2,
+          },
+        ],
+      },
+      { solutionId: "double" },
+    );
+
+    expect(result.solutionCount).toBe(1);
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]).toMatchObject({
+      solutionId: "double",
+      benchmarkCase: 1,
+      iterations: 3,
+      description: "small input",
+    });
+    expect(result.results[0]?.averageMs).toBeGreaterThanOrEqual(0);
+  });
+
+  test("benchmarkSuite formats benchmark output", () => {
+    const output = formatBenchmarkSuiteResult(
+      benchmarkSuite([{ ...passingProblem, benchmarkCases: [{ input: 2 }] }]),
+    );
+
+    expect(output).toContain("BENCHMARK");
+    expect(output).toContain("sample-001");
+    expect(output).toContain("BENCHMARK SUMMARY");
+  });
 });
 
 describe("formatters", () => {
@@ -189,6 +281,41 @@ describe("formatters", () => {
     expect(output).toContain("Test #1 - double two");
     expect(output).toContain("Expected: 4");
     expect(output).toContain("Received: 0");
+  });
+
+  test("formatProblemResult formats undefined and circular values", () => {
+    const circular: Record<string, unknown> = {};
+    circular.self = circular;
+
+    const output = formatProblemResult({
+      problemId: "sample-003",
+      title: "Formatting",
+      mode: "solution",
+      passed: 0,
+      failed: 2,
+      total: 2,
+      solutionCount: 1,
+      durationMs: 1,
+      failures: [
+        {
+          solutionId: "learner",
+          solutionTitle: "Learner Solution",
+          testCase: 1,
+          expected: undefined,
+          received: undefined,
+        },
+        {
+          solutionId: "learner",
+          solutionTitle: "Learner Solution",
+          testCase: 2,
+          expected: circular,
+          received: circular,
+        },
+      ],
+    });
+
+    expect(output).toContain("Expected: undefined");
+    expect(output).toContain("[Circular]");
   });
 
   test("formatSuiteResult includes mode, totals, and failed problems", () => {
