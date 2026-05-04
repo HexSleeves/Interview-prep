@@ -6,6 +6,15 @@ export interface TestCase<TInput, TOutput> {
 
 export type Solution<TInput, TOutput> = (input: TInput) => TOutput;
 
+export interface SolutionVariant<TInput, TOutput> {
+  id: string;
+  title: string;
+  description?: string;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+  implementation: Solution<TInput, TOutput>;
+}
+
 export type CompareOutput<TOutput, TInput = unknown> = (
   expected: TOutput,
   received: TOutput,
@@ -25,7 +34,7 @@ export interface ProblemDefinition<TInput, TOutput> {
 
 export interface Problem<TInput, TOutput> extends ProblemDefinition<TInput, TOutput> {
   solution: Solution<TInput, TOutput>;
-  referenceSolution: Solution<TInput, TOutput>;
+  referenceSolutions: SolutionVariant<TInput, TOutput>[];
 }
 
 export type AnyProblemDefinition = ProblemDefinition<any, any>;
@@ -35,9 +44,12 @@ export type RunMode = "solution" | "reference";
 
 export interface RunProblemOptions {
   mode?: RunMode;
+  solutionId?: string;
 }
 
 export interface TestFailure {
+  solutionId: string;
+  solutionTitle: string;
   testCase: number;
   description?: string;
   expected: unknown;
@@ -52,6 +64,7 @@ export interface ProblemResult {
   passed: number;
   failed: number;
   total: number;
+  solutionCount: number;
   durationMs: number;
   failures: TestFailure[];
 }

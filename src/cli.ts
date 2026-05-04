@@ -9,30 +9,34 @@ function printHelp(): void {
 Interview Prep CLI - Practice coding interview problems
 
 Usage:
-  bun run cli <command> [options]
+  bun . <command> [options]
 
 Commands:
   list                          List all available problems
   list <domain>                 List problems in a specific domain
   show <problem-id>             Show a problem prompt
   show <problem-id> --hints     Show a problem prompt with hints
+  show <problem-id> --solutions Show available reference approaches
   run <problem-id>              Run editable learner solution
   run --domain <domain>         Run editable learner solutions in a domain
   run --all                     Run all editable learner solutions
   check <problem-id>            Run reference solution
   check --domain <domain>       Run reference solutions in a domain
   check --all                   Run all reference solutions
+  check <problem-id> --solution <solution-id>
 
 Available domains:
   ${DOMAINS.join(", ")}
 
 Examples:
-  bun run cli list
-  bun run cli list sliding-window
-  bun run cli show bst-001 --hints
-  bun run cli run bst-001
-  bun run cli check --domain frequency
-  bun run cli check --all
+  bun . list
+  bun . list sliding-window
+  bun . show bst-001 --hints
+  bun . show freq-001 --solutions
+  bun . run bst-001
+  bun . check --domain frequency
+  bun . check freq-001 --solution optimized
+  bun . check --all
 `);
 }
 
@@ -55,7 +59,7 @@ function getDomain(domain: string): Domain {
 function getProblemById(id: string): AnyProblem {
   const problem = allProblems.find((candidate) => candidate.id === id);
   if (!problem) {
-    fail(`Problem not found: ${id}`, "Use 'bun run cli list' to see available problems.");
+    fail(`Problem not found: ${id}`, "Use 'bun . list' to see available problems.");
   }
 
   return problem;
@@ -93,6 +97,7 @@ function showProblem(id: string | undefined, flags: string[]): void {
 
   const problem = getProblemById(id);
   const showHints = flags.includes("--hints");
+  const showSolutions = flags.includes("--solutions");
 
   console.log(`\n${problem.title} (${problem.id})`);
   console.log(`${"=".repeat(problem.title.length + problem.id.length + 3)}`);
@@ -107,11 +112,29 @@ function showProblem(id: string | undefined, flags: string[]): void {
     }
   }
 
+  if (showSolutions) {
+    console.log("\nSolutions:");
+    for (const solution of problem.referenceSolutions) {
+      const complexity = [
+        solution.timeComplexity ? `time ${solution.timeComplexity}` : undefined,
+        solution.spaceComplexity ? `space ${solution.spaceComplexity}` : undefined,
+      ]
+        .filter(Boolean)
+        .join(", ");
+      console.log(
+        `  - ${solution.id}: ${solution.title}${complexity ? ` (${complexity})` : ""}`
+      );
+      if (solution.description) {
+        console.log(`    ${solution.description}`);
+      }
+    }
+  }
+
   console.log("");
 }
 
-function runProblemById(id: string, mode: RunMode): void {
-  const result = runProblem(getProblemById(id), { mode });
+function runProblemById(id: string, mode: RunMode, solutionId?: string): void {
+  const result = runProblem(getProblemById(id), { mode, solutionId });
   console.log(formatProblemResult(result));
 
   if (result.failed > 0) {
@@ -119,12 +142,12 @@ function runProblemById(id: string, mode: RunMode): void {
   }
 }
 
-function runDomain(domain: string, mode: RunMode): void {
+function runDomain(domain: string, mode: RunMode, solutionId?: string): void {
   const validDomain = getDomain(domain);
   const problems = problemsByDomain[validDomain];
   console.log(`\nRunning ${mode} mode for "${validDomain}"...\n`);
 
-  const result = runSuite(problems, { mode });
+  const result = runSuite(problems, { mode, solutionId });
   console.log(formatSuiteResult(result));
 
   if (result.failedProblems > 0) {
@@ -132,10 +155,10 @@ function runDomain(domain: string, mode: RunMode): void {
   }
 }
 
-function runAll(mode: RunMode): void {
+function runAll(mode: RunMode, solutionId?: string): void {
   console.log(`\nRunning ${mode} mode for all problems...\n`);
 
-  const result = runSuite(allProblems, { mode });
+  const result = runSuite(allProblems, { mode, solutionId });
   console.log(formatSuiteResult(result));
 
   if (result.failedProblems > 0) {
@@ -144,25 +167,39 @@ function runAll(mode: RunMode): void {
 }
 
 function runCommand(args: string[], mode: RunMode): void {
-  if (args[0] === "--all") {
-    runAll(mode);
+  const solutionId = getFlagValue(args, "--solution");
+  const positionalArgs = removeFlagWithValue(args, "--solution");
+
+  if (positionalArgs[0] === "--all") {
+    runAll(mode, solutionId);
     return;
   }
 
-  if (args[0] === "--domain") {
-    if (!args[1]) {
+  if (positionalArgs[0] === "--domain") {
+    if (!positionalArgs[1]) {
       fail("Please specify a domain.", `Available domains: ${DOMAINS.join(", ")}`);
     }
-    runDomain(args[1], mode);
+    runDomain(positionalArgs[1], mode, solutionId);
     return;
   }
 
-  if (args[0]) {
-    runProblemById(args[0], mode);
+  if (positionalArgs[0]) {
+    runProblemById(positionalArgs[0], mode, solutionId);
     return;
   }
 
   fail("Please specify a problem ID, --domain <domain>, or --all");
+}
+
+function getFlagValue(args: string[], flag: string): string | undefined {
+  const index = args.indexOf(flag);
+  return index === -1 ? undefined : args[index + 1];
+}
+
+function removeFlagWithValue(args: string[], flag: string): string[] {
+  const index = args.indexOf(flag);
+  if (index === -1) return args;
+  return args.filter((_, argIndex) => argIndex !== index && argIndex !== index + 1);
 }
 
 const args = process.argv.slice(2);

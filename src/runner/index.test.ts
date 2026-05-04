@@ -18,7 +18,13 @@ const passingProblem: Problem<number, number> = {
     { input: 3, expected: 6, description: "double three" },
   ],
   solution: (input) => input * 2,
-  referenceSolution: (input) => input * 3,
+  referenceSolutions: [
+    {
+      id: "triple",
+      title: "Triple",
+      implementation: (input) => input * 3,
+    },
+  ],
 };
 
 describe("runProblem", () => {
@@ -43,7 +49,59 @@ describe("runProblem", () => {
       description: "double two",
       expected: 4,
       received: 6,
+      solutionId: "triple",
     });
+  });
+
+  test("reference mode executes every reference solution variant", () => {
+    const result = runProblem(
+      {
+        ...passingProblem,
+        referenceSolutions: [
+          {
+            id: "double-a",
+            title: "Double A",
+            implementation: (input) => input * 2,
+          },
+          {
+            id: "double-b",
+            title: "Double B",
+            implementation: (input) => input * 2,
+          },
+        ],
+      },
+      { mode: "reference" },
+    );
+
+    expect(result.solutionCount).toBe(2);
+    expect(result.total).toBe(4);
+    expect(result.passed).toBe(4);
+    expect(result.failed).toBe(0);
+  });
+
+  test("reference mode can run one reference solution variant by id", () => {
+    const result = runProblem(
+      {
+        ...passingProblem,
+        referenceSolutions: [
+          {
+            id: "wrong",
+            title: "Wrong",
+            implementation: (input) => input * 3,
+          },
+          {
+            id: "right",
+            title: "Right",
+            implementation: (input) => input * 2,
+          },
+        ],
+      },
+      { mode: "reference", solutionId: "right" },
+    );
+
+    expect(result.solutionCount).toBe(1);
+    expect(result.total).toBe(2);
+    expect(result.failed).toBe(0);
   });
 
   test("reports failed expected and received values", () => {
@@ -87,7 +145,13 @@ describe("runProblem", () => {
       tags: ["array"],
       testCases: [{ input: [1, 2, 3], expected: [1, 2, 3] }],
       solution: (input) => [...input].reverse(),
-      referenceSolution: (input) => input,
+      referenceSolutions: [
+        {
+          id: "identity",
+          title: "Identity",
+          implementation: (input) => input,
+        },
+      ],
       compareOutput: (expected, received) =>
         expected.length === received.length &&
         [...expected]
@@ -127,6 +191,7 @@ describe("formatters", () => {
 
     expect(output).toContain("FAILED");
     expect(output).toContain("mode: solution");
+    expect(output).toContain("Solutions: 1");
     expect(output).toContain("Tests: 0/2 passed");
     expect(output).toContain("Test #1 - double two");
     expect(output).toContain("Expected: 4");

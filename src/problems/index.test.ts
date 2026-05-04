@@ -6,7 +6,7 @@ describe("problem organization", () => {
   test("problem definitions do not expose executable solutions", () => {
     for (const definition of allProblemDefinitions) {
       expect("solution" in definition).toBe(false);
-      expect("referenceSolution" in definition).toBe(false);
+      expect("referenceSolutions" in definition).toBe(false);
     }
   });
 
@@ -15,7 +15,8 @@ describe("problem organization", () => {
 
     for (const problem of allProblems) {
       expect(problem.solution).toBeFunction();
-      expect(problem.referenceSolution).toBeFunction();
+      expect(problem.referenceSolutions.length).toBeGreaterThan(0);
+      expect(problem.referenceSolutions[0]?.implementation).toBeFunction();
     }
   });
 });

@@ -17,14 +17,15 @@ bun install
 1. List problems:
 
    ```bash
-   bun run list
+   bun . list
    ```
 
-2. Read a prompt:
+2. Read a prompt, hints, or approach summaries:
 
    ```bash
-   bun run cli show bst-001
-   bun run cli show bst-001 --hints
+   bun . show bst-001
+   bun . show bst-001 --hints
+   bun . show bst-001 --solutions
    ```
 
 3. Open the learner file in `src/solutions/<domain>/`.
@@ -32,7 +33,7 @@ bun install
 5. Run your solution:
 
    ```bash
-   bun run cli run bst-001
+   bun . run bst-001
    ```
 
 `run` mode executes the editable `solution`, so it is expected to fail for unsolved problems.
@@ -42,9 +43,10 @@ bun install
 Use `check` mode to run reference solutions:
 
 ```bash
-bun run cli check --all
-bun run cli check --domain frequency
-bun run cli check bst-001
+bun . check --all
+bun . check --domain frequency
+bun . check bst-001
+bun . check bst-001 --solution optimized
 ```
 
 Run the full validation suite:
@@ -58,16 +60,18 @@ bun run test
 ## CLI
 
 ```bash
-bun run cli list
-bun run cli list <domain>
-bun run cli show <problem-id>
-bun run cli show <problem-id> --hints
-bun run cli run <problem-id>
-bun run cli run --domain <domain>
-bun run cli run --all
-bun run cli check <problem-id>
-bun run cli check --domain <domain>
-bun run cli check --all
+bun . list
+bun . list <domain>
+bun . show <problem-id>
+bun . show <problem-id> --hints
+bun . show <problem-id> --solutions
+bun . run <problem-id>
+bun . run --domain <domain>
+bun . run --all
+bun . check <problem-id>
+bun . check <problem-id> --solution <solution-id>
+bun . check --domain <domain>
+bun . check --all
 ```
 
 ## Problem Domains
@@ -122,9 +126,9 @@ src/
 1. Copy `src/problems/_template.problem.ts` into the target domain folder.
 2. Copy `src/solutions/_template.solution.ts` into the matching domain folder.
 3. Copy `src/reference/_template.reference.ts` into the matching domain folder.
-4. Fill in the `Input`, `Output`, prompt, test cases, hints, learner stub, and reference solution.
+4. Fill in the `Input`, `Output`, prompt, test cases, hints, learner stub, and reference solutions.
 5. Add the problem definition to the domain's `src/problems/<domain>/index.ts`.
-6. Wire the problem definition, learner solution, and reference solution together in `src/registry/<domain>.ts`.
+6. Wire the problem definition, learner solution, and reference solutions together in `src/registry/<domain>.ts`.
 7. Run:
 
    ```bash

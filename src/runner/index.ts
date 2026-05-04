@@ -1,4 +1,12 @@
-import type { Problem, ProblemResult, RunMode, RunProblemOptions, SuiteResult, AnyProblem } from "../types/problem.ts";
+import type {
+  AnyProblem,
+  Problem,
+  ProblemResult,
+  RunMode,
+  RunProblemOptions,
+  SolutionVariant,
+  SuiteResult,
+} from "../types/problem.ts";
 
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
@@ -28,32 +36,38 @@ export function runProblem<TInput, TOutput>(
 ): ProblemResult {
   const mode = options.mode ?? "solution";
   const start = performance.now();
-  const candidate = mode === "reference" ? problem.referenceSolution : problem.solution;
+  const candidates = getCandidates(problem, mode, options.solutionId);
   const compareOutput = problem.compareOutput ?? deepEqual;
   const failures: ProblemResult["failures"] = [];
   let passed = 0;
 
-  for (let i = 0; i < problem.testCases.length; i++) {
-    const testCase = problem.testCases[i]!;
-    try {
-      const result = candidate(testCase.input);
-      if (compareOutput(testCase.expected, result, testCase)) {
-        passed++;
-      } else {
+  for (const candidate of candidates) {
+    for (let i = 0; i < problem.testCases.length; i++) {
+      const testCase = problem.testCases[i]!;
+      try {
+        const result = candidate.implementation(testCase.input);
+        if (compareOutput(testCase.expected, result, testCase)) {
+          passed++;
+        } else {
+          failures.push({
+            solutionId: candidate.id,
+            solutionTitle: candidate.title,
+            testCase: i + 1,
+            description: testCase.description,
+            expected: testCase.expected,
+            received: result,
+          });
+        }
+      } catch (error) {
         failures.push({
+          solutionId: candidate.id,
+          solutionTitle: candidate.title,
           testCase: i + 1,
           description: testCase.description,
           expected: testCase.expected,
-          received: result,
+          error: error instanceof Error ? error.message : String(error),
         });
       }
-    } catch (error) {
-      failures.push({
-        testCase: i + 1,
-        description: testCase.description,
-        expected: testCase.expected,
-        error: error instanceof Error ? error.message : String(error),
-      });
     }
   }
 
@@ -63,10 +77,32 @@ export function runProblem<TInput, TOutput>(
     mode,
     passed,
     failed: failures.length,
-    total: problem.testCases.length,
+    total: problem.testCases.length * candidates.length,
+    solutionCount: candidates.length,
     durationMs: performance.now() - start,
     failures,
   };
+}
+
+function getCandidates<TInput, TOutput>(
+  problem: Problem<TInput, TOutput>,
+  mode: RunMode,
+  solutionId?: string,
+): SolutionVariant<TInput, TOutput>[] {
+  const candidates =
+    mode === "solution"
+      ? [
+          {
+            id: "learner",
+            title: "Learner Solution",
+            implementation: problem.solution,
+          },
+        ]
+      : problem.referenceSolutions;
+
+  if (!solutionId) return candidates;
+
+  return candidates.filter((candidate) => candidate.id === solutionId);
 }
 
 export function runSuite(problems: AnyProblem[], options: RunProblemOptions = {}): SuiteResult {
@@ -99,12 +135,14 @@ export function formatProblemResult(result: ProblemResult): string {
     `\n${"=".repeat(60)}`,
     `${status} | ${result.title} (${result.problemId}) | mode: ${result.mode}`,
     `${"=".repeat(60)}`,
+    `Solutions: ${result.solutionCount}`,
     `Tests: ${result.passed}/${result.total} passed (${result.durationMs.toFixed(1)}ms)`,
   ];
 
   if (result.failures.length > 0) {
     lines.push("\nFailed test cases:");
     for (const failure of result.failures) {
+      lines.push(`\n  Solution: ${failure.solutionTitle} (${failure.solutionId})`);
       lines.push(`\n  Test #${failure.testCase}${failure.description ? ` - ${failure.description}` : ""}`);
       lines.push(`    Expected: ${JSON.stringify(failure.expected)}`);
       if (failure.error) {

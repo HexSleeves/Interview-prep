@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 const cli = async (...args: string[]) => {
-  const proc = Bun.spawn(["bun", "run", "src/cli.ts", ...args], {
+  const proc = Bun.spawn(["bun", ".", ...args], {
     stdout: "pipe",
     stderr: "pipe",
   });
@@ -30,7 +30,6 @@ describe("cli", () => {
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toContain("FAILED");
     expect(result.stdout).toContain("mode: solution");
-    expect(result.stdout).toContain("not implemented");
   });
 
   test("list can filter by domain", async () => {
@@ -48,5 +47,14 @@ describe("cli", () => {
     expect(result.stdout).toContain("Validate Binary Search Tree");
     expect(result.stdout).toContain("Difficulty: medium");
     expect(result.stdout).toContain("Hints:");
+  });
+
+  test("show can list available solution approaches without source code", async () => {
+    const result = await cli("show", "freq-001", "--solutions");
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Solutions:");
+    expect(result.stdout).toContain("optimized");
+    expect(result.stdout).not.toContain("const freqMap");
   });
 });
