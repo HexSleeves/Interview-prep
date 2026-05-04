@@ -143,7 +143,9 @@ export function formatProblemResult(result: ProblemResult): string {
     lines.push("\nFailed test cases:");
     for (const failure of result.failures) {
       lines.push(`\n  Solution: ${failure.solutionTitle} (${failure.solutionId})`);
-      lines.push(`\n  Test #${failure.testCase}${failure.description ? ` - ${failure.description}` : ""}`);
+      lines.push(
+        `\n  Test #${failure.testCase}${failure.description ? ` - ${failure.description}` : ""}`,
+      );
       lines.push(`    Expected: ${JSON.stringify(failure.expected)}`);
       if (failure.error) {
         lines.push(`    Error: ${failure.error}`);

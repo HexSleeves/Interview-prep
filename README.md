@@ -74,6 +74,20 @@ bun run test
 
 `bun run test` runs Bun tests for the harness and then checks every reference solution.
 
+## Formatting and Linting
+
+This project uses Oxc tooling:
+
+```bash
+bun run format        # format with oxfmt
+bun run format:check  # verify formatting
+bun run lint          # lint with oxlint
+bun run lint:fix      # apply safe oxlint fixes
+bun run typecheck     # run TypeScript checks
+```
+
+`bun run test` runs formatting, linting, typechecking, Bun tests, and all reference solution checks.
+
 ## CLI
 
 ```bash

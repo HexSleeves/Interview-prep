@@ -18,7 +18,7 @@ export interface SolutionVariant<TInput, TOutput> {
 export type CompareOutput<TOutput, TInput = unknown> = (
   expected: TOutput,
   received: TOutput,
-  testCase: TestCase<TInput, TOutput>
+  testCase: TestCase<TInput, TOutput>,
 ) => boolean;
 
 export interface ProblemDefinition<TInput, TOutput> {

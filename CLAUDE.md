@@ -3,12 +3,14 @@
 This is a TypeScript coding interview practice platform. Problems are organized by domain.
 
 ## Quick Commands
+
 - `bun run list` - List all problems
 - `bun run test` - Run all problems
 - `bun run cli run <problem-id>` - Run specific problem
 - `bun run cli run --domain <domain>` - Run domain suite
 
 ## Domains
+
 - binary-search-tree
 - frequency
 - prefix-sum

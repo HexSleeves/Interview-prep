@@ -1,11 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { Problem } from "../types/problem.ts";
-import {
-  formatProblemResult,
-  formatSuiteResult,
-  runProblem,
-  runSuite,
-} from "./index.ts";
+import { formatProblemResult, formatSuiteResult, runProblem, runSuite } from "./index.ts";
 
 const passingProblem: Problem<number, number> = {
   id: "sample-001",
@@ -185,9 +180,7 @@ describe("runSuite", () => {
 
 describe("formatters", () => {
   test("formatProblemResult includes mode, totals, and failure details", () => {
-    const output = formatProblemResult(
-      runProblem({ ...passingProblem, solution: () => 0 })
-    );
+    const output = formatProblemResult(runProblem({ ...passingProblem, solution: () => 0 }));
 
     expect(output).toContain("FAILED");
     expect(output).toContain("mode: solution");
@@ -199,9 +192,7 @@ describe("formatters", () => {
   });
 
   test("formatSuiteResult includes mode, totals, and failed problems", () => {
-    const output = formatSuiteResult(
-      runSuite([{ ...passingProblem, solution: () => 0 }])
-    );
+    const output = formatSuiteResult(runSuite([{ ...passingProblem, solution: () => 0 }]));
 
     expect(output).toContain("SUITE SUMMARY");
     expect(output).toContain("Mode: solution");

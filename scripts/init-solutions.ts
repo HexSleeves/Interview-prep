@@ -40,7 +40,9 @@ async function branchExists(branch: string): Promise<boolean> {
 }
 
 async function remoteBranchExists(branch: string): Promise<boolean> {
-  return (await git(["show-ref", "--verify", "--quiet", `refs/remotes/origin/${branch}`])).exitCode === 0;
+  return (
+    (await git(["show-ref", "--verify", "--quiet", `refs/remotes/origin/${branch}`])).exitCode === 0
+  );
 }
 
 async function chooseBaseBranch(): Promise<string | undefined> {
@@ -65,7 +67,7 @@ async function main(): Promise<void> {
       [
         "Worktree has uncommitted changes.",
         "Commit or stash them before creating/switching to the solutions branch so main stays clean.",
-      ].join("\n")
+      ].join("\n"),
     );
   }
 

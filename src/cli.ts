@@ -121,9 +121,7 @@ function showProblem(id: string | undefined, flags: string[]): void {
       ]
         .filter(Boolean)
         .join(", ");
-      console.log(
-        `  - ${solution.id}: ${solution.title}${complexity ? ` (${complexity})` : ""}`
-      );
+      console.log(`  - ${solution.id}: ${solution.title}${complexity ? ` (${complexity})` : ""}`);
       if (solution.description) {
         console.log(`    ${solution.description}`);
       }
