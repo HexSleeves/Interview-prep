@@ -12,6 +12,23 @@ A TypeScript coding interview practice harness built with Bun. Problem prompts, 
 bun install
 ```
 
+## Branch Workflow
+
+Keep `main` as the clean practice harness and answer-key branch. Do not commit your learner implementations to `main`.
+
+Use a dedicated `solutions` branch for solved attempts:
+
+```bash
+bun run init:solutions
+```
+
+The init script:
+
+- creates `solutions` from `main` or `master` when it does not exist
+- switches to `solutions` when it already exists
+- tracks `origin/solutions` when that remote branch already exists locally
+- refuses to switch away from `main` or another branch if there are uncommitted changes, so practice edits do not leak into the wrong branch
+
 ## Practice Workflow
 
 1. List problems:
