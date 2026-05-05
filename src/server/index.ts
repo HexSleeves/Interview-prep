@@ -14,7 +14,7 @@ const server = Bun.serve({
 
     "/api/problems": {
       GET: () => {
-        const summaries = allProblems.map(p => ({
+        const summaries = allProblems.map((p) => ({
           id: p.id,
           title: p.title,
           difficulty: p.difficulty,
@@ -39,7 +39,7 @@ const server = Bun.serve({
       POST: async (req) => {
         let body: { problemId: string; userCode: string };
         try {
-          body = await req.json() as { problemId: string; userCode: string };
+          body = (await req.json()) as { problemId: string; userCode: string };
         } catch {
           return Response.json({ ok: false, error: "Invalid request body" }, { status: 400 });
         }
@@ -52,7 +52,7 @@ const server = Bun.serve({
       POST: async (req) => {
         let body: HintRequest;
         try {
-          body = await req.json() as HintRequest;
+          body = (await req.json()) as HintRequest;
         } catch {
           return Response.json({ hint: "Coach is unavailable — try again in a moment." });
         }

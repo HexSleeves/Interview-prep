@@ -25,33 +25,33 @@ describe("buildHintMessages", () => {
 
   test("user message includes problem title", () => {
     const messages = buildHintMessages(baseRequest);
-    const userMsg = messages.find(m => m.role === "user")!;
+    const userMsg = messages.find((m) => m.role === "user")!;
     expect(userMsg.content).toContain("Maximum Sum Subarray of Size K");
   });
 
   test("user message includes user code", () => {
     const messages = buildHintMessages(baseRequest);
-    const userMsg = messages.find(m => m.role === "user")!;
+    const userMsg = messages.find((m) => m.role === "user")!;
     expect(userMsg.content).toContain("const solution");
   });
 
   test("user message includes failing case", () => {
     const messages = buildHintMessages(baseRequest);
-    const userMsg = messages.find(m => m.role === "user")!;
+    const userMsg = messages.find((m) => m.role === "user")!;
     expect(userMsg.content).toContain("9");
   });
 
   test("previous hints are included in messages as assistant turns", () => {
     const req = { ...baseRequest, previousHints: ["What is the window size?"] };
     const messages = buildHintMessages(req);
-    const assistantMsgs = messages.filter(m => m.role === "assistant");
+    const assistantMsgs = messages.filter((m) => m.role === "assistant");
     expect(assistantMsgs.length).toBe(1);
     expect(assistantMsgs[0]!.content).toBe("What is the window size?");
   });
 
   test("does not include testCases or hints from ProblemDefinition in messages", () => {
     const messages = buildHintMessages(baseRequest);
-    const allContent = messages.map(m => m.content).join(" ");
+    const allContent = messages.map((m) => m.content).join(" ");
     // These are the static hints from the problem — should not appear
     expect(allContent).not.toContain("Use a sliding window of size k");
   });

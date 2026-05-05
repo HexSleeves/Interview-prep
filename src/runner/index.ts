@@ -211,7 +211,10 @@ export function benchmarkProblem<TInput, TOutput>(
   };
 }
 
-export function benchmarkSuite(problems: AnyProblem[], options: RunProblemOptions = {}): BenchmarkSuiteResult {
+export function benchmarkSuite(
+  problems: AnyProblem[],
+  options: RunProblemOptions = {},
+): BenchmarkSuiteResult {
   return {
     totalProblems: problems.length,
     results: problems.map((problem) => benchmarkProblem(problem, options)),
@@ -232,7 +235,9 @@ export function formatProblemResult(result: ProblemResult): string {
     lines.push("\nFailed test cases:");
     for (const failure of result.failures) {
       lines.push(`\n  Solution: ${failure.solutionTitle} (${failure.solutionId})`);
-      lines.push(`\n  Test #${failure.testCase}${failure.description ? ` - ${failure.description}` : ""}`);
+      lines.push(
+        `\n  Test #${failure.testCase}${failure.description ? ` - ${failure.description}` : ""}`,
+      );
       lines.push(`    Expected: ${formatValue(failure.expected)}`);
       if (failure.comparatorError) {
         lines.push(`    Comparator error: ${failure.comparatorError}`);

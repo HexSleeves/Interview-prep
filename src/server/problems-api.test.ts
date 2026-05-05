@@ -65,7 +65,7 @@ describe("getProblemResponse", () => {
     const map = await buildSolutionPathMap();
     const resp = await getProblemResponse("bst-002", map);
     expect(resp!.starterCode).toContain("class TreeNode");
-    expect(resp!.starterCode).not.toContain('import { TreeNode }');
+    expect(resp!.starterCode).not.toContain("import { TreeNode }");
   });
 
   test("returns null for unknown problem id", async () => {

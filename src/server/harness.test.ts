@@ -6,7 +6,8 @@ describe("buildHarness", () => {
     const result = buildHarness({
       serverRoot: "/tmp/myproject",
       problemId: "window-001",
-      userCode: 'const solution = (_input: Input): Output => { throw new Error("not implemented"); };',
+      userCode:
+        'const solution = (_input: Input): Output => { throw new Error("not implemented"); };',
     });
     expect(result).toContain('"/tmp/myproject/src/runner/index.ts"');
     expect(result).toContain('"/tmp/myproject/src/registry/index.ts"');
@@ -22,7 +23,8 @@ describe("buildHarness", () => {
   });
 
   test("injects user code verbatim between imports and runProblem call", () => {
-    const userCode = 'type Input = string;\ntype Output = number;\nconst solution = (_input: Input): Output => 42;';
+    const userCode =
+      "type Input = string;\ntype Output = number;\nconst solution = (_input: Input): Output => 42;";
     const result = buildHarness({ serverRoot: "/tmp", problemId: "test-001", userCode });
     expect(result).toContain(userCode);
   });
@@ -33,7 +35,9 @@ describe("buildHarness", () => {
       problemId: "x",
       userCode: "const solution = (_input: Input): Output => null as any;",
     });
-    expect(result.trimEnd()).toMatch(/process\.stdout\.write\(JSON\.stringify\(result\)\)\s*;?\s*$/);
+    expect(result.trimEnd()).toMatch(
+      /process\.stdout\.write\(JSON\.stringify\(result\)\)\s*;?\s*$/,
+    );
   });
 });
 
@@ -59,7 +63,7 @@ describe("extractStarterCode", () => {
     const src = `import { TreeNode } from "../../types/tree.ts";\n\ntype Input = { root: TreeNode | null };\ntype Output = boolean;\n\nexport const solution = (_input: Input): Output => {\n  return true;\n};\n`;
     const result = extractStarterCode(src, true);
     expect(result).toContain("class TreeNode");
-    expect(result).not.toContain('import { TreeNode }');
+    expect(result).not.toContain("import { TreeNode }");
   });
 
   test("non-BST problem does not prepend TreeNode class", () => {

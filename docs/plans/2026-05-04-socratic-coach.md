@@ -13,6 +13,7 @@ Stack: `Bun.serve()` + React + `@monaco-editor/react` + `@anthropic-ai/sdk`
 ## Dependency Install (pre-task)
 
 Run once before any task:
+
 ```
 bun add react react-dom @monaco-editor/react @anthropic-ai/sdk
 bun add -d @types/react @types/react-dom
@@ -23,6 +24,7 @@ bun add -d @types/react @types/react-dom
 ### Task 1: Install frontend and AI SDK dependencies
 
 **Files:**
+
 - Modify: `/Users/lecoqjacob/Developer/Interview-prep/package.json`
 
 - [ ] Step 1: Run `bun add react react-dom @monaco-editor/react @anthropic-ai/sdk` from `/Users/lecoqjacob/Developer/Interview-prep`
@@ -35,9 +37,11 @@ bun add -d @types/react @types/react-dom
 ### Task 2: Write failing tests for the harness generator utility
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/harness.test.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 import { describe, expect, test } from "bun:test";
 import { buildHarness, extractStarterCode } from "./harness.ts";
@@ -47,7 +51,8 @@ describe("buildHarness", () => {
     const result = buildHarness({
       serverRoot: "/tmp/myproject",
       problemId: "window-001",
-      userCode: 'const solution = (_input: Input): Output => { throw new Error("not implemented"); };',
+      userCode:
+        'const solution = (_input: Input): Output => { throw new Error("not implemented"); };',
     });
     expect(result).toContain('"/tmp/myproject/src/runner/index.ts"');
     expect(result).toContain('"/tmp/myproject/src/registry/index.ts"');
@@ -63,7 +68,8 @@ describe("buildHarness", () => {
   });
 
   test("injects user code verbatim between imports and runProblem call", () => {
-    const userCode = 'type Input = string;\ntype Output = number;\nconst solution = (_input: Input): Output => 42;';
+    const userCode =
+      "type Input = string;\ntype Output = number;\nconst solution = (_input: Input): Output => 42;";
     const result = buildHarness({ serverRoot: "/tmp", problemId: "test-001", userCode });
     expect(result).toContain(userCode);
   });
@@ -74,7 +80,9 @@ describe("buildHarness", () => {
       problemId: "x",
       userCode: "const solution = (_input: Input): Output => null as any;",
     });
-    expect(result.trimEnd()).toMatch(/process\.stdout\.write\(JSON\.stringify\(result\)\)\s*;?\s*$/);
+    expect(result.trimEnd()).toMatch(
+      /process\.stdout\.write\(JSON\.stringify\(result\)\)\s*;?\s*$/,
+    );
   });
 });
 
@@ -100,7 +108,7 @@ describe("extractStarterCode", () => {
     const src = `import { TreeNode } from "../../types/tree.ts";\n\ntype Input = { root: TreeNode | null };\ntype Output = boolean;\n\nexport const solution = (_input: Input): Output => {\n  return true;\n};\n`;
     const result = extractStarterCode(src, true);
     expect(result).toContain("class TreeNode");
-    expect(result).not.toContain('import { TreeNode }');
+    expect(result).not.toContain("import { TreeNode }");
   });
 
   test("non-BST problem does not prepend TreeNode class", () => {
@@ -117,6 +125,7 @@ describe("extractStarterCode", () => {
   });
 });
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/harness.test.ts` — confirm all tests FAIL (file not found)
 - [ ] Step 3: Commit: `git commit -m "test: add failing tests for harness generator utility"`
 
@@ -125,9 +134,11 @@ describe("extractStarterCode", () => {
 ### Task 3: Implement the harness generator utility
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/harness.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 const TREE_NODE_INLINE = `class TreeNode<T = number> {
   val: T;
@@ -164,7 +175,7 @@ export function extractStarterCode(fileContent: string, isBst: boolean): string 
   const lines = fileContent.split("\n");
 
   // Remove import lines
-  const withoutImports = lines.filter(line => !line.trimStart().startsWith("import ")).join("\n");
+  const withoutImports = lines.filter((line) => !line.trimStart().startsWith("import ")).join("\n");
 
   // Strip leading `export ` from `export const solution`
   const withoutExport = withoutImports.replace(/^export (const solution)/m, "$1");
@@ -183,6 +194,7 @@ export function extractStarterCode(fileContent: string, isBst: boolean): string 
   return trimmed;
 }
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/harness.test.ts` — confirm all tests PASS
 - [ ] Step 3: Commit: `git commit -m "feat: implement harness generator utility"`
 
@@ -191,9 +203,11 @@ export function extractStarterCode(fileContent: string, isBst: boolean): string 
 ### Task 4: Write failing tests for the problem API helpers
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/problems-api.test.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 import { describe, expect, test } from "bun:test";
 import { buildSolutionPathMap, getProblemResponse } from "./problems-api.ts";
@@ -262,7 +276,7 @@ describe("getProblemResponse", () => {
     const map = await buildSolutionPathMap();
     const resp = await getProblemResponse("bst-002", map);
     expect(resp!.starterCode).toContain("class TreeNode");
-    expect(resp!.starterCode).not.toContain('import { TreeNode }');
+    expect(resp!.starterCode).not.toContain("import { TreeNode }");
   });
 
   test("returns null for unknown problem id", async () => {
@@ -272,6 +286,7 @@ describe("getProblemResponse", () => {
   });
 });
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/problems-api.test.ts` — confirm all tests FAIL
 - [ ] Step 3: Commit: `git commit -m "test: add failing tests for problem API helpers"`
 
@@ -280,9 +295,11 @@ describe("getProblemResponse", () => {
 ### Task 5: Implement the problem API helpers
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/problems-api.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 import { allProblems } from "../registry/index.ts";
 import { extractStarterCode } from "./harness.ts";
@@ -318,7 +335,7 @@ export async function getProblemResponse(
   id: string,
   solutionPathMap: Map<string, string>,
 ): Promise<ProblemResponse | null> {
-  const problem = allProblems.find(p => p.id === id);
+  const problem = allProblems.find((p) => p.id === id);
   if (!problem) return null;
 
   const solutionPath = solutionPathMap.get(id);
@@ -335,7 +352,7 @@ export async function getProblemResponse(
     description: problem.description,
     difficulty: problem.difficulty,
     tags: problem.tags,
-    visibleTestCases: problem.testCases.slice(0, 2).map(tc => ({
+    visibleTestCases: problem.testCases.slice(0, 2).map((tc) => ({
       input: tc.input,
       expected: tc.expected,
     })),
@@ -343,6 +360,7 @@ export async function getProblemResponse(
   };
 }
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/problems-api.test.ts` — confirm all tests PASS
 - [ ] Step 3: Commit: `git commit -m "feat: implement problem API helpers with Bun.Glob path scanning"`
 
@@ -351,9 +369,11 @@ export async function getProblemResponse(
 ### Task 6: Write failing tests for the /api/run subprocess handler
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/run-handler.test.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 import { describe, expect, test } from "bun:test";
 import { runUserCode } from "./run-handler.ts";
@@ -410,13 +430,16 @@ const solution = (_input: Input): Output => 0;`;
 
   test("temp harness file is deleted after execution (no accumulation)", async () => {
     const userCode = `type Input = { nums: number[]; k: number };\ntype Output = number;\nconst solution = (_input: Input): Output => 0;`;
-    const before = (await Array.fromAsync(new Bun.Glob("/tmp/solution-window-001-*.ts").scan("/"))).length;
+    const before = (await Array.fromAsync(new Bun.Glob("/tmp/solution-window-001-*.ts").scan("/")))
+      .length;
     await runUserCode("window-001", userCode);
-    const after = (await Array.fromAsync(new Bun.Glob("/tmp/solution-window-001-*.ts").scan("/"))).length;
+    const after = (await Array.fromAsync(new Bun.Glob("/tmp/solution-window-001-*.ts").scan("/")))
+      .length;
     expect(after).toBeLessThanOrEqual(before);
   }, 10000);
 });
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/run-handler.test.ts` — confirm all tests FAIL
 - [ ] Step 3: Commit: `git commit -m "test: add failing tests for /api/run subprocess handler"`
 
@@ -425,18 +448,18 @@ const solution = (_input: Input): Output => 0;`;
 ### Task 7: Implement the /api/run subprocess handler
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/run-handler.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 import type { ProblemResult } from "../types/problem.ts";
 import { buildHarness } from "./harness.ts";
 
 const SERVER_ROOT = process.cwd();
 
-export type RunResult =
-  | { ok: true; result: ProblemResult }
-  | { ok: false; error: string };
+export type RunResult = { ok: true; result: ProblemResult } | { ok: false; error: string };
 
 export async function runUserCode(problemId: string, userCode: string): Promise<RunResult> {
   const ts = Date.now();
@@ -469,6 +492,7 @@ export async function runUserCode(problemId: string, userCode: string): Promise<
   }
 }
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/run-handler.test.ts` — confirm all tests PASS
 - [ ] Step 3: Commit: `git commit -m "feat: implement run-handler using Bun.spawn subprocess with try/finally cleanup"`
 
@@ -477,9 +501,11 @@ export async function runUserCode(problemId: string, userCode: string): Promise<
 ### Task 8: Write failing tests for the /api/hint handler
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/hint-handler.test.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 import { describe, expect, test } from "bun:test";
 import { buildHintMessages, SOCRATIC_SYSTEM_PROMPT } from "./hint-handler.ts";
@@ -508,33 +534,33 @@ describe("buildHintMessages", () => {
 
   test("user message includes problem title", () => {
     const messages = buildHintMessages(baseRequest);
-    const userMsg = messages.find(m => m.role === "user")!;
+    const userMsg = messages.find((m) => m.role === "user")!;
     expect(userMsg.content).toContain("Maximum Sum Subarray of Size K");
   });
 
   test("user message includes user code", () => {
     const messages = buildHintMessages(baseRequest);
-    const userMsg = messages.find(m => m.role === "user")!;
+    const userMsg = messages.find((m) => m.role === "user")!;
     expect(userMsg.content).toContain("const solution");
   });
 
   test("user message includes failing case", () => {
     const messages = buildHintMessages(baseRequest);
-    const userMsg = messages.find(m => m.role === "user")!;
+    const userMsg = messages.find((m) => m.role === "user")!;
     expect(userMsg.content).toContain("9");
   });
 
   test("previous hints are included in messages as assistant turns", () => {
     const req = { ...baseRequest, previousHints: ["What is the window size?"] };
     const messages = buildHintMessages(req);
-    const assistantMsgs = messages.filter(m => m.role === "assistant");
+    const assistantMsgs = messages.filter((m) => m.role === "assistant");
     expect(assistantMsgs.length).toBe(1);
     expect(assistantMsgs[0]!.content).toBe("What is the window size?");
   });
 
   test("does not include testCases or hints from ProblemDefinition in messages", () => {
     const messages = buildHintMessages(baseRequest);
-    const allContent = messages.map(m => m.content).join(" ");
+    const allContent = messages.map((m) => m.content).join(" ");
     // These are the static hints from the problem — should not appear
     expect(allContent).not.toContain("Use a sliding window of size k");
   });
@@ -550,6 +576,7 @@ describe("SOCRATIC_SYSTEM_PROMPT", () => {
   });
 });
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/hint-handler.test.ts` — confirm all tests FAIL
 - [ ] Step 3: Commit: `git commit -m "test: add failing tests for hint handler message builder"`
 
@@ -558,9 +585,11 @@ describe("SOCRATIC_SYSTEM_PROMPT", () => {
 ### Task 9: Implement the hint handler
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/hint-handler.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -658,6 +687,7 @@ export async function getHint(req: HintRequest): Promise<string> {
   }
 }
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/hint-handler.test.ts` — confirm all tests PASS
 - [ ] Step 3: Commit: `git commit -m "feat: implement Socratic hint handler with 4s timeout and graceful fallback"`
 
@@ -666,9 +696,11 @@ export async function getHint(req: HintRequest): Promise<string> {
 ### Task 10: Create the HTML entry point
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/index.html`
 
 - [ ] Step 1: Create the file with this content:
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -677,8 +709,18 @@ export async function getHint(req: HintRequest): Promise<string> {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Algorithm Gym</title>
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #1e1e1e; color: #d4d4d4; height: 100vh; overflow: hidden; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        height: 100vh;
+        overflow: hidden;
+      }
     </style>
   </head>
   <body>
@@ -687,6 +729,7 @@ export async function getHint(req: HintRequest): Promise<string> {
   </body>
 </html>
 ```
+
 - [ ] Step 2: Commit: `git commit -m "feat: add HTML entry point for Bun.serve HTML import"`
 
 ---
@@ -694,9 +737,11 @@ export async function getHint(req: HintRequest): Promise<string> {
 ### Task 11: Create the React frontend (3-pane layout scaffold)
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/frontend.tsx`
 
 - [ ] Step 1: Create the file with this content:
+
 ```tsx
 import React, { useState, useEffect, useCallback } from "react";
 import { createRoot } from "react-dom/client";
@@ -891,15 +936,14 @@ function LeftPane({
 }) {
   const [domain, setDomain] = useState<DomainFilter>("all");
 
-  const filtered =
-    domain === "all" ? problems : problems.filter(p => p.tags.includes(domain));
+  const filtered = domain === "all" ? problems : problems.filter((p) => p.tags.includes(domain));
 
   return (
     <div style={styles.leftPane}>
       <div style={{ marginBottom: 10 }}>
         <select
           value={domain}
-          onChange={e => setDomain(e.target.value as DomainFilter)}
+          onChange={(e) => setDomain(e.target.value as DomainFilter)}
           style={{
             width: "100%",
             background: "#3a3d41",
@@ -910,14 +954,14 @@ function LeftPane({
             fontSize: 13,
           }}
         >
-          {DOMAINS.map(d => (
+          {DOMAINS.map((d) => (
             <option key={d} value={d}>
               {d === "all" ? "All Domains" : d}
             </option>
           ))}
         </select>
       </div>
-      {filtered.map(p => (
+      {filtered.map((p) => (
         <div
           key={p.id}
           style={{
@@ -1004,11 +1048,7 @@ function ResultPanel({
   }
 
   if (!runResult) {
-    return (
-      <div style={{ color: "#666", fontSize: 13 }}>
-        Run your code to see results.
-      </div>
-    );
+    return <div style={{ color: "#666", fontSize: 13 }}>Run your code to see results.</div>;
   }
 
   const allPassed = runResult.failed === 0;
@@ -1106,9 +1146,7 @@ function App() {
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    fetchProblems()
-      .then(setProblems)
-      .catch(console.error);
+    fetchProblems().then(setProblems).catch(console.error);
   }, []);
 
   const handleSelectProblem = useCallback(async (id: string) => {
@@ -1170,7 +1208,7 @@ function App() {
         previousHints,
       });
       setHint(h);
-      setPreviousHints(prev => [...prev, h]);
+      setPreviousHints((prev) => [...prev, h]);
     } catch {
       setHint("Coach is unavailable — try again in a moment.");
     } finally {
@@ -1183,19 +1221,11 @@ function App() {
       {/* Header */}
       <div style={styles.header}>
         <span style={{ fontSize: 15, fontWeight: 700, color: "#e5c07b" }}>Algorithm Gym</span>
-        {problem && (
-          <span style={{ fontSize: 13, color: "#888" }}>
-            {problem.id}
-          </span>
-        )}
+        {problem && <span style={{ fontSize: 13, color: "#888" }}>{problem.id}</span>}
       </div>
 
       {/* Left pane */}
-      <LeftPane
-        problems={problems}
-        selectedId={selectedId}
-        onSelect={handleSelectProblem}
-      />
+      <LeftPane problems={problems} selectedId={selectedId} onSelect={handleSelectProblem} />
 
       {/* Center pane */}
       <div style={styles.centerPane}>
@@ -1216,7 +1246,7 @@ function App() {
                 language="typescript"
                 theme="vs-dark"
                 value={code}
-                onChange={v => setCode(v ?? "")}
+                onChange={(v) => setCode(v ?? "")}
                 options={{
                   fontSize: 14,
                   minimap: { enabled: false },
@@ -1267,6 +1297,7 @@ function App() {
 const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
 ```
+
 - [ ] Step 2: Commit: `git commit -m "feat: add React frontend with 3-pane layout, Monaco editor, and coach panel"`
 
 ---
@@ -1274,6 +1305,7 @@ root.render(<App />);
 ### Task 12: Create the Bun.serve() server with all API routes
 
 **Files:**
+
 - Modify: `/Users/lecoqjacob/Developer/Interview-prep/index.ts`
 
 - [ ] Step 1: Read current `index.ts` content (it currently just re-exports from src — will be replaced with the server)
@@ -1283,6 +1315,7 @@ root.render(<App />);
 > **Resolution assumed:** Replace `index.ts` with the server. The CLI is still accessible via `bun src/cli.ts` directly. Update `package.json` `"cli"` script from `bun .` to `bun src/cli.ts`.
 
 - [ ] Step 2: Replace `index.ts` with this content:
+
 ```typescript
 import index from "./index.html";
 import { allProblems } from "./src/registry/index.ts";
@@ -1300,7 +1333,7 @@ const server = Bun.serve({
 
     "/api/problems": {
       GET: () => {
-        const summaries = allProblems.map(p => ({
+        const summaries = allProblems.map((p) => ({
           id: p.id,
           title: p.title,
           difficulty: p.difficulty,
@@ -1325,7 +1358,7 @@ const server = Bun.serve({
       POST: async (req) => {
         let body: { problemId: string; userCode: string };
         try {
-          body = await req.json() as { problemId: string; userCode: string };
+          body = (await req.json()) as { problemId: string; userCode: string };
         } catch {
           return Response.json({ ok: false, error: "Invalid request body" }, { status: 400 });
         }
@@ -1338,7 +1371,7 @@ const server = Bun.serve({
       POST: async (req) => {
         let body: HintRequest;
         try {
-          body = await req.json() as HintRequest;
+          body = (await req.json()) as HintRequest;
         } catch {
           return Response.json({ hint: "Coach is unavailable — try again in a moment." });
         }
@@ -1356,6 +1389,7 @@ const server = Bun.serve({
 
 console.log(`Algorithm Gym running at http://localhost:${server.port}`);
 ```
+
 - [ ] Step 3: Update `package.json` scripts: change `"cli": "bun ."` to `"cli": "bun src/cli.ts"` and `"run": "bun . run"` to `"run": "bun src/cli.ts run"`. Also add `"dev": "bun --hot index.ts"`.
 - [ ] Step 4: Commit: `git commit -m "feat: add Bun.serve() server with problem, run, and hint API routes"`
 
@@ -1364,9 +1398,11 @@ console.log(`Algorithm Gym running at http://localhost:${server.port}`);
 ### Task 13: Write integration smoke test for the server API routes
 
 **Files:**
+
 - Create: `/Users/lecoqjacob/Developer/Interview-prep/src/server/api.test.ts`
 
 - [ ] Step 1: Create the file with this content:
+
 ```typescript
 import { describe, expect, test, beforeAll, afterAll } from "bun:test";
 import { allProblems } from "../registry/index.ts";
@@ -1429,6 +1465,7 @@ describe("POST /api/run equivalent", () => {
   }, 15000);
 });
 ```
+
 - [ ] Step 2: Run `bun test /Users/lecoqjacob/Developer/Interview-prep/src/server/api.test.ts` — confirm all tests PASS
 - [ ] Step 3: Commit: `git commit -m "test: add integration smoke tests for server API handlers"`
 
@@ -1453,7 +1490,9 @@ describe("POST /api/run equivalent", () => {
 ## Verification
 
 After all tasks, run:
+
 ```
 bun --hot index.ts
 ```
+
 Open `http://localhost:3000`, select a problem, write code, click Run, click Ask Coach.

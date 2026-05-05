@@ -53,9 +53,11 @@ const solution = (_input: Input): Output => 0;`;
 
   test("temp harness file is deleted after execution (no accumulation)", async () => {
     const userCode = `type Input = { nums: number[]; k: number };\ntype Output = number;\nconst solution = (_input: Input): Output => 0;`;
-    const before = (await Array.fromAsync(new Bun.Glob("/tmp/solution-window-001-*.ts").scan("/"))).length;
+    const before = (await Array.fromAsync(new Bun.Glob("/tmp/solution-window-001-*.ts").scan("/")))
+      .length;
     await runUserCode("window-001", userCode);
-    const after = (await Array.fromAsync(new Bun.Glob("/tmp/solution-window-001-*.ts").scan("/"))).length;
+    const after = (await Array.fromAsync(new Bun.Glob("/tmp/solution-window-001-*.ts").scan("/")))
+      .length;
     expect(after).toBeLessThanOrEqual(before);
   }, 10000);
 });

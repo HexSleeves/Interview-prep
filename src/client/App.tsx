@@ -119,30 +119,27 @@ function LeftPane({
 }) {
   const [domain, setDomain] = useState<DomainFilter>("all");
 
-  const filtered =
-    domain === "all" ? problems : problems.filter(p => p.tags.includes(domain));
+  const filtered = domain === "all" ? problems : problems.filter((p) => p.tags.includes(domain));
 
   return (
     <div className="overflow-y-auto border-r border-zinc-700 bg-zinc-800 p-3">
       <select
         value={domain}
-        onChange={e => setDomain(e.target.value as DomainFilter)}
+        onChange={(e) => setDomain(e.target.value as DomainFilter)}
         className="mb-2.5 w-full rounded border border-zinc-700 bg-zinc-700 px-2 py-1 text-sm text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
       >
-        {DOMAINS.map(d => (
+        {DOMAINS.map((d) => (
           <option key={d} value={d}>
             {d === "all" ? "All Domains" : d}
           </option>
         ))}
       </select>
-      {filtered.map(p => (
+      {filtered.map((p) => (
         <button
           key={p.id}
           onClick={() => onSelect(p.id)}
           className={`mb-0.5 block w-full cursor-pointer rounded px-2.5 py-1.5 text-left text-sm transition-colors ${
-            selectedId === p.id
-              ? "bg-blue-900/70 text-zinc-100"
-              : "text-zinc-300 hover:bg-zinc-700/60"
+            selectedId === p.id ? "bg-blue-900/70 text-zinc-100" : "text-zinc-300 hover:bg-zinc-700/60"
           }`}
         >
           <div className="mb-0.5">{p.title}</div>
@@ -165,10 +162,7 @@ function ProblemPanel({ problem }: { problem: ProblemDetail }) {
         <div className="mt-3">
           <div className="mb-1.5 text-xs text-zinc-500">Examples</div>
           {problem.visibleTestCases.map((tc, i) => (
-            <div
-              key={i}
-              className="mb-1.5 rounded bg-zinc-900 px-2.5 py-2 font-mono text-xs"
-            >
+            <div key={i} className="mb-1.5 rounded bg-zinc-900 px-2.5 py-2 font-mono text-xs">
               <div>
                 <span className="text-zinc-500">Input: </span>
                 {JSON.stringify(tc.input)}
@@ -214,23 +208,14 @@ function ResultPanel({
   const allPassed = runResult.failed === 0;
   return (
     <div className="flex flex-col gap-2.5">
-      <div
-        className={`text-[15px] font-bold ${
-          allPassed ? "text-emerald-400" : "text-red-400"
-        }`}
-      >
-        {allPassed
-          ? `All ${runResult.total} tests passed`
-          : `${runResult.passed}/${runResult.total} passed`}
+      <div className={`text-[15px] font-bold ${allPassed ? "text-emerald-400" : "text-red-400"}`}>
+        {allPassed ? `All ${runResult.total} tests passed` : `${runResult.passed}/${runResult.total} passed`}
       </div>
 
       {!allPassed && runResult.failures.length > 0 && (
         <div>
           {runResult.failures.slice(0, 3).map((f, i) => (
-            <div
-              key={i}
-              className="mb-1.5 rounded bg-zinc-900 px-2.5 py-2 font-mono text-xs"
-            >
+            <div key={i} className="mb-1.5 rounded bg-zinc-900 px-2.5 py-2 font-mono text-xs">
               <div className="mb-1 text-zinc-500">
                 Test #{f.testCase}
                 {f.description ? ` — ${f.description}` : ""}
@@ -286,9 +271,7 @@ function App() {
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    fetchProblems()
-      .then(setProblems)
-      .catch(console.error);
+    fetchProblems().then(setProblems).catch(console.error);
   }, []);
 
   const handleSelectProblem = useCallback(async (id: string) => {
@@ -350,7 +333,7 @@ function App() {
         previousHints,
       });
       setHint(h);
-      setPreviousHints(prev => [...prev, h]);
+      setPreviousHints((prev) => [...prev, h]);
     } catch {
       setHint("Coach is unavailable — try again in a moment.");
     } finally {
@@ -388,7 +371,7 @@ function App() {
                 language="typescript"
                 theme="vs-dark"
                 value={code}
-                onChange={v => setCode(v ?? "")}
+                onChange={(v) => setCode(v ?? "")}
                 options={{
                   fontSize: 14,
                   minimap: { enabled: false },
@@ -399,9 +382,7 @@ function App() {
             </div>
           </>
         ) : (
-          <div className="flex flex-1 items-center justify-center text-sm text-zinc-600">
-            Select a problem to start
-          </div>
+          <div className="flex flex-1 items-center justify-center text-sm text-zinc-600">Select a problem to start</div>
         )}
       </div>
 
