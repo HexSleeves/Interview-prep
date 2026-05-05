@@ -9,6 +9,15 @@ export const solution = (input: Input): Output => {
     freqMap.set(num, (freqMap.get(num) ?? 0) + 1);
   }
 
-  const buckets = [];
-  throw new Error("not implemented");
+  const buckets: number[][] = Array.from({ length: nums.length + 1 }, () => []);
+  for (const [num, freq] of freqMap) {
+    buckets[freq]!.push(num);
+  }
+
+  const result: number[] = [];
+  for (let i = buckets.length - 1; i > 0 && result.length < k; i--) {
+    result.push(...buckets[i]);
+  }
+
+  return result;
 };
