@@ -22,14 +22,23 @@
     "test:bst": "bun . check --domain binary-search-tree",
     "test:frequency": "bun . check --domain frequency",
     "test:prefix": "bun . check --domain prefix-sum",
-    "test:window": "bun . check --domain sliding-window"
+    "test:window": "bun . check --domain sliding-window",
+    "dev": "bun --hot server.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.93.0",
+    "@monaco-editor/react": "^4.7.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   }
 }
