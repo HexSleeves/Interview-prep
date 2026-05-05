@@ -1,4 +1,4 @@
-import index from "./index.html";
+import index from "./src/client/index.html";
 import { allProblems } from "./src/registry/index.ts";
 import { buildSolutionPathMap, getProblemResponse } from "./src/server/problems-api.ts";
 import { runUserCode } from "./src/server/run-handler.ts";
