@@ -7,9 +7,9 @@ import {
   formatSuiteResult,
   runProblem,
   runSuite,
-} from "./runner/index.ts";
-import { allProblems, problemsByDomain, type Domain } from "./registry/index.ts";
-import type { AnyProblem, RunMode } from "./types/problem.ts";
+} from "../runner/index.ts";
+import { allProblems, problemsByDomain, type Domain } from "../registry/index.ts";
+import type { AnyProblem, RunMode } from "../types/problem.ts";
 
 const DOMAINS = Object.keys(problemsByDomain) as Domain[];
 

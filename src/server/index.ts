@@ -1,9 +1,9 @@
-import index from "./src/client/index.html";
-import { allProblems } from "./src/registry/index.ts";
-import { buildSolutionPathMap, getProblemResponse } from "./src/server/problems-api.ts";
-import { runUserCode } from "./src/server/run-handler.ts";
-import { getHint } from "./src/server/hint-handler.ts";
-import type { HintRequest } from "./src/server/hint-handler.ts";
+import index from "../client/index.html";
+import { allProblems } from "../registry/index.ts";
+import { buildSolutionPathMap, getProblemResponse } from "./problems-api.ts";
+import { runUserCode } from "./run-handler.ts";
+import { getHint } from "./hint-handler.ts";
+import type { HintRequest } from "./hint-handler.ts";
 
 // Build problem path map once at startup
 const solutionPathMap = await buildSolutionPathMap();

@@ -2,7 +2,7 @@
   "name": "interview-prep",
   "private": true,
   "type": "module",
-  "module": "src/cli.ts",
+  "module": "src/cli/index.ts",
   "scripts": {
     "run": "bun . run",
     "init:solutions": "bun scripts/init-solutions.ts",
@@ -23,14 +23,16 @@
     "test:frequency": "bun . check --domain frequency",
     "test:prefix": "bun . check --domain prefix-sum",
     "test:window": "bun . check --domain sliding-window",
-    "dev": "bun --hot server.ts"
+    "dev": "bun --hot src/server/index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "bun-plugin-tailwind": "^0.1.2",
     "oxfmt": "^0.47.0",
-    "oxlint": "^1.62.0"
+    "oxlint": "^1.62.0",
+    "tailwindcss": "^4.2.4"
   },
   "peerDependencies": {
     "typescript": "^5"

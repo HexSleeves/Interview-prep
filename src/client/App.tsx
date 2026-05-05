@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import Editor from "@monaco-editor/react";
+import "./style.css";
 
 // ---- Types ----
 
@@ -84,82 +85,12 @@ async function fetchHint(payload: {
   return data.hint;
 }
 
-// ---- Styles (inline for single-file) ----
+// ---- Constants ----
 
-const styles = {
-  app: {
-    display: "grid",
-    gridTemplateColumns: "260px 1fr 360px",
-    gridTemplateRows: "48px 1fr",
-    height: "100vh",
-    gap: 0,
-  } as React.CSSProperties,
-  header: {
-    gridColumn: "1 / -1",
-    background: "#252526",
-    borderBottom: "1px solid #3e3e42",
-    display: "flex",
-    alignItems: "center",
-    padding: "0 16px",
-    gap: 12,
-  } as React.CSSProperties,
-  leftPane: {
-    background: "#252526",
-    borderRight: "1px solid #3e3e42",
-    overflowY: "auto" as const,
-    padding: 12,
-  } as React.CSSProperties,
-  centerPane: {
-    display: "flex",
-    flexDirection: "column" as const,
-    background: "#1e1e1e",
-  } as React.CSSProperties,
-  rightPane: {
-    background: "#252526",
-    borderLeft: "1px solid #3e3e42",
-    overflowY: "auto" as const,
-    padding: 12,
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: 12,
-  } as React.CSSProperties,
-  editorToolbar: {
-    display: "flex",
-    gap: 8,
-    padding: "8px 12px",
-    background: "#2d2d30",
-    borderBottom: "1px solid #3e3e42",
-  } as React.CSSProperties,
-  btn: {
-    padding: "5px 14px",
-    borderRadius: 4,
-    border: "none",
-    cursor: "pointer",
-    fontSize: 13,
-    fontWeight: 600,
-  } as React.CSSProperties,
-  btnPrimary: { background: "#0e639c", color: "#fff" } as React.CSSProperties,
-  btnSecondary: { background: "#3a3d41", color: "#d4d4d4" } as React.CSSProperties,
-  problemItem: {
-    padding: "7px 10px",
-    borderRadius: 4,
-    cursor: "pointer",
-    marginBottom: 2,
-    fontSize: 13,
-  } as React.CSSProperties,
-  badge: {
-    display: "inline-block",
-    padding: "1px 6px",
-    borderRadius: 10,
-    fontSize: 11,
-    fontWeight: 600,
-  } as React.CSSProperties,
-} as const;
-
-const DIFFICULTY_COLORS: Record<Difficulty, string> = {
-  easy: "#4ec994",
-  medium: "#e5c07b",
-  hard: "#e06c75",
+const DIFFICULTY_BADGE: Record<Difficulty, string> = {
+  easy: "bg-emerald-400/10 text-emerald-400",
+  medium: "bg-amber-300/10 text-amber-300",
+  hard: "bg-red-400/10 text-red-400",
 };
 
 const DOMAINS = ["all", "binary-search-tree", "frequency", "prefix-sum", "sliding-window"] as const;
@@ -170,11 +101,7 @@ type DomainFilter = (typeof DOMAINS)[number];
 function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
   return (
     <span
-      style={{
-        ...styles.badge,
-        background: DIFFICULTY_COLORS[difficulty] + "22",
-        color: DIFFICULTY_COLORS[difficulty],
-      }}
+      className={`inline-block rounded-full px-1.5 py-0.5 text-[11px] font-semibold ${DIFFICULTY_BADGE[difficulty]}`}
     >
       {difficulty}
     </span>
@@ -196,40 +123,31 @@ function LeftPane({
     domain === "all" ? problems : problems.filter(p => p.tags.includes(domain));
 
   return (
-    <div style={styles.leftPane}>
-      <div style={{ marginBottom: 10 }}>
-        <select
-          value={domain}
-          onChange={e => setDomain(e.target.value as DomainFilter)}
-          style={{
-            width: "100%",
-            background: "#3a3d41",
-            color: "#d4d4d4",
-            border: "1px solid #3e3e42",
-            borderRadius: 4,
-            padding: "4px 8px",
-            fontSize: 13,
-          }}
-        >
-          {DOMAINS.map(d => (
-            <option key={d} value={d}>
-              {d === "all" ? "All Domains" : d}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className="overflow-y-auto border-r border-zinc-700 bg-zinc-800 p-3">
+      <select
+        value={domain}
+        onChange={e => setDomain(e.target.value as DomainFilter)}
+        className="mb-2.5 w-full rounded border border-zinc-700 bg-zinc-700 px-2 py-1 text-sm text-zinc-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+      >
+        {DOMAINS.map(d => (
+          <option key={d} value={d}>
+            {d === "all" ? "All Domains" : d}
+          </option>
+        ))}
+      </select>
       {filtered.map(p => (
-        <div
+        <button
           key={p.id}
-          style={{
-            ...styles.problemItem,
-            background: selectedId === p.id ? "#094771" : "transparent",
-          }}
           onClick={() => onSelect(p.id)}
+          className={`mb-0.5 block w-full cursor-pointer rounded px-2.5 py-1.5 text-left text-sm transition-colors ${
+            selectedId === p.id
+              ? "bg-blue-900/70 text-zinc-100"
+              : "text-zinc-300 hover:bg-zinc-700/60"
+          }`}
         >
-          <div style={{ marginBottom: 3 }}>{p.title}</div>
+          <div className="mb-0.5">{p.title}</div>
           <DifficultyBadge difficulty={p.difficulty} />
-        </div>
+        </button>
       ))}
     </div>
   );
@@ -238,40 +156,25 @@ function LeftPane({
 function ProblemPanel({ problem }: { problem: ProblemDetail }) {
   return (
     <div>
-      <h2 style={{ fontSize: 16, marginBottom: 6 }}>{problem.title}</h2>
+      <h2 className="mb-1.5 text-base font-semibold text-zinc-100">{problem.title}</h2>
       <DifficultyBadge difficulty={problem.difficulty} />
-      <pre
-        style={{
-          marginTop: 10,
-          fontSize: 13,
-          whiteSpace: "pre-wrap",
-          lineHeight: 1.6,
-          color: "#abb2bf",
-        }}
-      >
+      <pre className="mt-2.5 whitespace-pre-wrap text-[13px] leading-relaxed text-zinc-400 font-sans">
         {problem.description}
       </pre>
       {problem.visibleTestCases.length > 0 && (
-        <div style={{ marginTop: 12 }}>
-          <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>Examples</div>
+        <div className="mt-3">
+          <div className="mb-1.5 text-xs text-zinc-500">Examples</div>
           {problem.visibleTestCases.map((tc, i) => (
             <div
               key={i}
-              style={{
-                background: "#1e1e1e",
-                borderRadius: 4,
-                padding: "8px 10px",
-                marginBottom: 6,
-                fontSize: 12,
-                fontFamily: "monospace",
-              }}
+              className="mb-1.5 rounded bg-zinc-900 px-2.5 py-2 font-mono text-xs"
             >
               <div>
-                <span style={{ color: "#888" }}>Input: </span>
+                <span className="text-zinc-500">Input: </span>
                 {JSON.stringify(tc.input)}
               </div>
               <div>
-                <span style={{ color: "#888" }}>Expected: </span>
+                <span className="text-zinc-500">Expected: </span>
                 {JSON.stringify(tc.expected)}
               </div>
             </div>
@@ -298,29 +201,23 @@ function ResultPanel({
   if (compileError) {
     return (
       <div>
-        <div style={{ color: "#e06c75", fontWeight: 600, marginBottom: 8 }}>Compile Error</div>
-        <pre style={{ fontSize: 12, color: "#e06c75", whiteSpace: "pre-wrap" }}>{compileError}</pre>
+        <div className="mb-2 font-semibold text-red-400">Compile Error</div>
+        <pre className="whitespace-pre-wrap text-xs text-red-400">{compileError}</pre>
       </div>
     );
   }
 
   if (!runResult) {
-    return (
-      <div style={{ color: "#666", fontSize: 13 }}>
-        Run your code to see results.
-      </div>
-    );
+    return <div className="text-sm text-zinc-500">Run your code to see results.</div>;
   }
 
   const allPassed = runResult.failed === 0;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div className="flex flex-col gap-2.5">
       <div
-        style={{
-          fontWeight: 700,
-          fontSize: 15,
-          color: allPassed ? "#4ec994" : "#e06c75",
-        }}
+        className={`text-[15px] font-bold ${
+          allPassed ? "text-emerald-400" : "text-red-400"
+        }`}
       >
         {allPassed
           ? `All ${runResult.total} tests passed`
@@ -332,29 +229,22 @@ function ResultPanel({
           {runResult.failures.slice(0, 3).map((f, i) => (
             <div
               key={i}
-              style={{
-                background: "#1e1e1e",
-                borderRadius: 4,
-                padding: "8px 10px",
-                marginBottom: 6,
-                fontSize: 12,
-                fontFamily: "monospace",
-              }}
+              className="mb-1.5 rounded bg-zinc-900 px-2.5 py-2 font-mono text-xs"
             >
-              <div style={{ color: "#888", marginBottom: 4 }}>
+              <div className="mb-1 text-zinc-500">
                 Test #{f.testCase}
                 {f.description ? ` — ${f.description}` : ""}
               </div>
               {f.error ? (
-                <div style={{ color: "#e06c75" }}>Error: {f.error}</div>
+                <div className="text-red-400">Error: {f.error}</div>
               ) : (
                 <>
                   <div>
-                    <span style={{ color: "#4ec994" }}>Expected: </span>
+                    <span className="text-emerald-400">Expected: </span>
                     {JSON.stringify(f.expected)}
                   </div>
                   <div>
-                    <span style={{ color: "#e06c75" }}>Received: </span>
+                    <span className="text-red-400">Received: </span>
                     {JSON.stringify(f.received)}
                   </div>
                 </>
@@ -365,26 +255,15 @@ function ResultPanel({
       )}
 
       <button
-        style={{ ...styles.btn, ...styles.btnSecondary }}
         onClick={onAskCoach}
         disabled={hintLoading}
+        className="rounded bg-zinc-700 px-3.5 py-1 text-sm font-semibold text-zinc-300 transition-colors hover:bg-zinc-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {hintLoading ? "Coach thinking..." : "Ask Coach"}
       </button>
 
       {hint && (
-        <div
-          style={{
-            background: "#1e1e1e",
-            border: "1px solid #3e3e42",
-            borderRadius: 4,
-            padding: "10px 12px",
-            fontSize: 13,
-            lineHeight: 1.6,
-            color: "#abb2bf",
-            fontStyle: "italic",
-          }}
-        >
+        <div className="rounded border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-sm italic leading-relaxed text-zinc-400">
           {hint}
         </div>
       )}
@@ -480,38 +359,30 @@ function App() {
   }, [problem, code, runResult, previousHints]);
 
   return (
-    <div style={styles.app}>
+    <div className="grid h-screen grid-cols-[260px_1fr_360px] grid-rows-[48px_1fr]">
       {/* Header */}
-      <div style={styles.header}>
-        <span style={{ fontSize: 15, fontWeight: 700, color: "#e5c07b" }}>Algorithm Gym</span>
-        {problem && (
-          <span style={{ fontSize: 13, color: "#888" }}>
-            {problem.id}
-          </span>
-        )}
-      </div>
+      <header className="col-span-3 flex items-center gap-3 border-b border-zinc-700 bg-zinc-800 px-4">
+        <span className="text-[15px] font-bold text-amber-300">Algorithm Gym</span>
+        {problem && <span className="text-[13px] text-zinc-500">{problem.id}</span>}
+      </header>
 
       {/* Left pane */}
-      <LeftPane
-        problems={problems}
-        selectedId={selectedId}
-        onSelect={handleSelectProblem}
-      />
+      <LeftPane problems={problems} selectedId={selectedId} onSelect={handleSelectProblem} />
 
       {/* Center pane */}
-      <div style={styles.centerPane}>
+      <div className="flex flex-col bg-zinc-900">
         {problem ? (
           <>
-            <div style={styles.editorToolbar}>
+            <div className="flex gap-2 border-b border-zinc-700 bg-zinc-800 px-3 py-2">
               <button
-                style={{ ...styles.btn, ...styles.btnPrimary }}
                 onClick={handleRun}
                 disabled={running}
+                className="rounded bg-blue-700 px-3.5 py-1 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {running ? "Running..." : "Run"}
               </button>
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <Editor
                 height="100%"
                 language="typescript"
@@ -528,27 +399,18 @@ function App() {
             </div>
           </>
         ) : (
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#555",
-              fontSize: 14,
-            }}
-          >
+          <div className="flex flex-1 items-center justify-center text-sm text-zinc-600">
             Select a problem to start
           </div>
         )}
       </div>
 
       {/* Right pane */}
-      <div style={styles.rightPane}>
+      <aside className="flex flex-col gap-3 overflow-y-auto border-l border-zinc-700 bg-zinc-800 p-3">
         {problem ? (
           <>
             <ProblemPanel problem={problem} />
-            <hr style={{ border: "none", borderTop: "1px solid #3e3e42" }} />
+            <hr className="border-zinc-700" />
             <ResultPanel
               runResult={runResult}
               compileError={compileError}
@@ -558,9 +420,9 @@ function App() {
             />
           </>
         ) : (
-          <div style={{ color: "#555", fontSize: 13 }}>Select a problem to start.</div>
+          <div className="text-sm text-zinc-600">Select a problem to start.</div>
         )}
-      </div>
+      </aside>
     </div>
   );
 }
