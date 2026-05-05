@@ -59,6 +59,7 @@ export interface TestFailure {
   solutionTitle: string;
   testCase: number;
   description?: string;
+  input?: unknown;
   expected: unknown;
   received?: unknown;
   error?: string;
